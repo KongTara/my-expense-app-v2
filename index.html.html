@@ -1,0 +1,3136 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ចំណូលចំណាយ">
+    <title>កម្មវិធីកត់ត្រាចំណូល-ចំណាយប្រចាំថ្ងៃ (Desktop & Mobile Offline)</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --income: #059669;
+            --income-bg: #d1fae5;
+            --expense: #e11d48;
+            --expense-bg: #ffe4e6;
+            --bank: #0284c7;
+            --bank-bg: #e0f2fe;
+            --cash: #b45309;
+            --cash-bg: #fef3c7;
+            --savings: #7c3aed;
+            --savings-bg: #ede9fe;
+            --sidebar-w: 256px;
+            --radius: 16px;
+            --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Khmer OS Battambang', 'Noto Sans Khmer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            overflow-x: hidden;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        /* =========================================
+           ADAPTIVE LAYOUT (DESKTOP + MOBILE)
+           ========================================= */
+        .layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Desktop Left Sidebar (>860px) */
+        .desktop-sidebar {
+            width: var(--sidebar-w);
+            background: #ffffff;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 14px;
+            z-index: 80;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .s-nav-btn {
+            border: none;
+            background: transparent;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .s-nav-btn:hover {
+            background: #f8fafc;
+            color: var(--text);
+        }
+
+        .s-nav-btn.active {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .sidebar-footer {
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .kbd-hint {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        kbd {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 1px 6px;
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            padding: 20px 24px 40px;
+            max-width: 100%;
+        }
+
+        /* Mobile Top Header (<=860px) */
+        .mobile-header {
+            display: none;
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+            color: #ffffff;
+            padding: 14px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 75;
+            box-shadow: 0 4px 16px rgba(15, 118, 110, 0.2);
+        }
+
+        .m-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Desktop Top Bar */
+        .desktop-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--card);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+        }
+
+        .wallet-pills {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+        .wallet-pills::-webkit-scrollbar { display: none; }
+
+        .w-pill {
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--text);
+            padding: 6px 13px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        /* Timeframe Segmented Bar & Quick Day/Week/Month Strip */
+        .tf-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tf-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tf-btn {
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--text-muted);
+            padding: 7px 13px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tf-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25);
+        }
+
+        .dwm-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .dwm-card {
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 15px;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: var(--shadow);
+        }
+
+        .dwm-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .dwm-card.active-period {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+        }
+
+        .dwm-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .dwm-range {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .dwm-metrics {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+
+        .w-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .mobile-header .w-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .mobile-header .w-pill.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            border-color: #ffffff;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 9px 15px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: #ffffff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-income { background: var(--income-bg); color: var(--income); }
+        .btn-danger { background: var(--expense-bg); color: var(--expense); }
+        .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 9px; }
+
+        .m-pill-btn {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* 4-Column Desktop / 2-Column Mobile KPI Summary Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .kpi-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card.hero-bal {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+            border-color: #99f6e4;
+        }
+
+        .kpi-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .kpi-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .kpi-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .kpi-val {
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .kpi-breakdown {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+            font-size: 11.5px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .kb-badge {
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .kb-badge.cash { background: var(--cash-bg); color: var(--cash); }
+        .kb-badge.bank { background: var(--bank-bg); color: var(--bank); }
+
+        .kb-num {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Dashboard Split Grid */
+        .dash-split {
+            display: grid;
+            grid-template-columns: 1.35fr 0.85fr;
+            gap: 16px;
+        }
+
+        /* Cards & Tables */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 18px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Mobile Transaction Cards (Shown on Mobile instead of wide table) */
+        .mobile-tx-cards {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .m-tx-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #ffffff;
+        }
+
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .icon-action {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+        .icon-action:hover { background: #e2e8f0; }
+
+        /* Form Controls */
+        .input-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            font-size: 13.5px;
+            color: var(--text);
+            background: #ffffff;
+            outline: none;
+        }
+        .input-control:focus { border-color: var(--primary); }
+
+        .seg-control {
+            display: inline-flex;
+            background: #e2e8f0;
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .seg-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .seg-btn.active {
+            background: #ffffff;
+            color: var(--text);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Progress Bars & Charts */
+        .prog-row { margin-bottom: 12px; }
+        .prog-row:last-child { margin-bottom: 0; }
+        .prog-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .prog-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .prog-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        .chart-box {
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .bar-chart-grid {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+            height: 200px;
+            min-width: 600px;
+            padding-top: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            cursor: pointer;
+        }
+        .bar-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 155px;
+        }
+        .bar-stick {
+            width: 12px;
+            border-radius: 4px 4px 0 0;
+            min-height: 2px;
+            transition: height 0.3s ease;
+        }
+        .bar-stick.inc { background: var(--income); }
+        .bar-stick.exp { background: var(--expense); }
+        .bar-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Views */
+        .view-pane { display: none; }
+        .view-pane.active { display: block; }
+
+        /* Mobile Bottom Navigation (<=860px) */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 2px calc(6px + env(safe-area-inset-bottom));
+            z-index: 85;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .m-bnav-btn {
+            border: none;
+            background: transparent;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 2px;
+        }
+        .m-bnav-btn.active { color: var(--primary); }
+        .m-bnav-ico { font-size: 18px; }
+
+        .m-fab {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -22px;
+            box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35);
+            cursor: pointer;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-dialog {
+            background: #ffffff;
+            width: 100%;
+            max-width: 560px;
+            max-height: 92vh;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        .modal-dialog.xl { max-width: 960px; }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title { font-size: 16px; font-weight: 800; }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-grp { margin-bottom: 12px; }
+        .form-lbl {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .cat-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .cat-opt {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            background: #ffffff;
+        }
+        .cat-opt.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .chips-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .chip {
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .chip.note {
+            background: #e0f2fe;
+            border-color: #bae6fd;
+            color: #0369a1;
+        }
+
+        /* Toast */
+        .toast-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s;
+            z-index: 400;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            white-space: nowrap;
+        }
+        .toast-bar.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* PIN Lock Screen */
+        .pin-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
+            color: #ffffff;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            padding: 20px;
+        }
+        .pin-screen.open { display: flex; }
+
+        .pin-dots { display: flex; gap: 14px; margin: 20px 0; }
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+        .pin-dot.filled { background: #ffffff; border-color: #ffffff; }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 72px);
+            gap: 14px;
+        }
+        .pin-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .pin-btn:active { background: rgba(255, 255, 255, 0.3); }
+
+        /* =========================================
+           MOBILE BREAKPOINT (<= 860px)
+           ========================================= */
+        @media (max-width: 860px) {
+            .desktop-sidebar, .desktop-topbar { display: none; }
+            .mobile-header { display: block; }
+            .mobile-bottom-nav { display: flex; }
+            .main-content {
+                margin-left: 0;
+                padding: 12px 12px 86px;
+            }
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .dwm-strip {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .kpi-val { font-size: 17px; }
+            .dash-split {
+                grid-template-columns: 1fr;
+            }
+            .desktop-table-only { display: none; }
+            .mobile-tx-cards { display: flex; }
+            .modal-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+            .modal-dialog {
+                border-radius: 22px 22px 0 0;
+                padding: 18px;
+            }
+            .toast-bar { bottom: 82px; }
+        }
+
+        @media (max-width: 440px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PIN Lock Screen -->
+    <div id="pinScreen" class="pin-screen">
+        <div style="font-size: 44px; margin-bottom: 8px;">🔒</div>
+        <h2 style="font-size: 18px; font-weight: 800;">សូមបញ្ចូលលេខកូដសម្ងាត់ (PIN)</h2>
+        <p id="pinErrText" style="font-size: 12.5px; color: #fda4af; min-height: 20px; margin-top: 4px;"></p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="pdot0"></div>
+            <div class="pin-dot" id="pdot1"></div>
+            <div class="pin-dot" id="pdot2"></div>
+            <div class="pin-dot" id="pdot3"></div>
+        </div>
+        <div class="pin-keypad">
+            <button type="button" class="pin-btn" onclick="pressPin('1')">1</button>
+            <button type="button" class="pin-btn" onclick="pressPin('2')">2</button>
+            <button type="button" class="pin-btn" onclick="pressPin('3')">3</button>
+            <button type="button" class="pin-btn" onclick="pressPin('4')">4</button>
+            <button type="button" class="pin-btn" onclick="pressPin('5')">5</button>
+            <button type="button" class="pin-btn" onclick="pressPin('6')">6</button>
+            <button type="button" class="pin-btn" onclick="pressPin('7')">7</button>
+            <button type="button" class="pin-btn" onclick="pressPin('8')">8</button>
+            <button type="button" class="pin-btn" onclick="pressPin('9')">9</button>
+            <button type="button" class="pin-btn" style="font-size: 14px;" onclick="clearPin()">លុប</button>
+            <button type="button" class="pin-btn" onclick="pressPin('0')">0</button>
+            <button type="button" class="pin-btn" style="font-size: 18px;" onclick="backspacePin()">⌫</button>
+        </div>
+    </div>
+
+    <!-- Mobile Sticky Header -->
+    <header class="mobile-header">
+        <div class="m-header-top">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 22px;">📒</span>
+                <div>
+                    <div style="font-size: 15px; font-weight: 800; line-height: 1.2;">ចំណូល-ចំណាយប្រចាំថ្ងៃ</div>
+                    <div style="font-size: 10.5px; opacity: 0.9;">Offline • សាច់ប្រាក់ & ធនាគារ</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <button type="button" id="mCurrBtn" class="m-pill-btn" onclick="toggleBaseCurrency()">៛</button>
+                <button type="button" id="mLockBtn" class="m-pill-btn" style="display: none;" onclick="lockAppNow()">🔒</button>
+            </div>
+        </div>
+        <div id="mobileWalletPills" class="wallet-pills"></div>
+    </header>
+
+    <div class="layout-wrapper">
+        <!-- Desktop Left Fixed Sidebar -->
+        <aside class="desktop-sidebar">
+            <div class="brand-box">
+                <div class="brand-icon">📒</div>
+                <div>
+                    <div class="brand-title">ចំណូល-ចំណាយ</div>
+                    <div class="brand-sub">Desktop & Mobile Offline</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button type="button" id="snav-dashboard" class="s-nav-btn active" onclick="switchView('dashboard')">🏠 ទំព័រដើម (Dashboard)</button>
+                <button type="button" id="snav-transactions" class="s-nav-btn" onclick="switchView('transactions')">📋 បញ្ជីប្រតិបត្តិការ</button>
+                <button type="button" id="snav-reports" class="s-nav-btn" onclick="switchView('reports')">📊 របាយការណ៍ប្រចាំខែ</button>
+                <button type="button" id="snav-savings" class="s-nav-btn" onclick="switchView('savings')">🐷 គោលដៅប្រាក់សន្សំ</button>
+                <button type="button" id="snav-settings" class="s-nav-btn" onclick="switchView('settings')">⚙️ ការកំណត់ & Backup</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div style="font-weight: 800; margin-bottom: 6px; color: var(--text);">⌨️ ផ្លូវកាត់ក្តារចុច (Shortcuts)</div>
+                <div class="kbd-hint"><span>កត់ត្រាថ្មី</span><kbd>N</kbd></div>
+                <div class="kbd-hint"><span>កត់ត្រាម្តងច្រើន</span><kbd>B</kbd></div>
+                <div class="kbd-hint"><span>ស្វែងរក</span><kbd>/</kbd></div>
+                <div class="kbd-hint"><span>បិទផ្ទាំង</span><kbd>Esc</kbd></div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <div class="main-content">
+            <!-- Desktop Top Bar -->
+            <div class="desktop-topbar">
+                <div id="desktopWalletPills" class="wallet-pills"></div>
+
+                <div class="topbar-actions">
+                    <button type="button" id="dCurrBtn" class="btn btn-secondary" onclick="toggleBaseCurrency()">💱 ប្រាក់រៀល (៛)</button>
+                    <button type="button" id="dLockBtn" class="btn btn-secondary" style="display: none;" onclick="lockAppNow()">🔒 ចាក់សោ</button>
+                    <button type="button" class="btn btn-secondary" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
+                    <button type="button" class="btn btn-primary" onclick="openTxModal()">➕ កត់ត្រាថ្មី</button>
+                </div>
+            </div>
+
+            <!-- Timeframe Segmented Bar: Day / Week / Month / All -->
+            <div id="timeframeBarSection" class="tf-bar">
+                <div class="tf-pills">
+                    <button type="button" id="tf-day" class="tf-btn" onclick="setTimeframeMode('day')">📅 ថ្ងៃនេះ / តាមថ្ងៃ</button>
+                    <button type="button" id="tf-week" class="tf-btn" onclick="setTimeframeMode('week')">📆 សប្តាហ៍នេះ</button>
+                    <button type="button" id="tf-month" class="tf-btn active" onclick="setTimeframeMode('month')">🗓️ ខែនេះ / តាមខែ</button>
+                    <button type="button" id="tf-all" class="tf-btn" onclick="setTimeframeMode('all')">🌐 ទាំងអស់</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <input type="date" id="tfDateInput" class="input-control" style="width: 155px; font-weight: 700; display: none;" onchange="onTimeframePickerChange()">
+                    <input type="month" id="tfMonthInput" class="input-control" style="width: 155px; font-weight: 700;" onchange="onTimeframePickerChange()">
+                    <span id="tfRangeBadge" style="font-size: 12px; font-weight: 700; color: var(--primary-dark); background: var(--primary-light); padding: 5px 10px; border-radius: 8px;">ខែនេះ</span>
+                </div>
+            </div>
+
+            <!-- 4-Column KPI Summary Cards -->
+            <section id="kpiGridSection" class="kpi-grid">
+                <!-- Card 1: Total Net Balance -->
+                <div class="kpi-card hero-bal">
+                    <div>
+                        <div class="kpi-top">
+                            <span class="kpi-label" id="balTitleLbl">សមតុល្យសរុប (ខែនេះ)</span>
+                            <div class="kpi-icon" style="background: var(--primary-light); color: var(--primary-dark);">💰</div>
+                        </div>
+                        <div id="kpiTotalBal" class="kpi-val" style="color: var(--primary-dark);">0 ៛</div>
+                        <div id="kpiSubBal" class="kpi-sub">≈ $0.00</div>
+                    </div>
+                    <div class="kpi-breakdown">
+                        <div class="kb-row">
+                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
+                            <span id="balCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                        <div class="kb-row">
+                            <span class="kb-badge bank">🏦 ធនាគារ</span>
+                            <span id="balBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Income (Cash vs Bank Breakdown) -->
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-top">
+                            <span class="kpi-label">ចំណូលសរុប</span>
+                            <div class="kpi-icon" style="background: var(--income-bg); color: var(--income);">↓</div>
+                        </div>
+                        <div id="kpiTotalInc" class="kpi-val" style="color: var(--income);">0 ៛</div>
+                        <div id="kpiSubInc" class="kpi-sub">≈ $0.00</div>
+                    </div>
+                    <div class="kpi-breakdown">
+                        <div class="kb-row">
+                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
+                            <span id="incCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                        <div class="kb-row">
+                            <span class="kb-badge bank">🏦 ធនាគារ</span>
+                            <span id="incBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Expense (Cash vs Bank Breakdown) -->
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-top">
+                            <span class="kpi-label">ចំណាយសរុប</span>
+                            <div class="kpi-icon" style="background: var(--expense-bg); color: var(--expense);">↑</div>
+                        </div>
+                        <div id="kpiTotalExp" class="kpi-val" style="color: var(--expense);">0 ៛</div>
+                        <div id="kpiSubExp" class="kpi-sub">≈ $0.00</div>
+                    </div>
+                    <div class="kpi-breakdown">
+                        <div class="kb-row">
+                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
+                            <span id="expCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                        <div class="kb-row">
+                            <span class="kb-badge bank">🏦 ធនាគារ</span>
+                            <span id="expBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Savings -->
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-top">
+                            <span class="kpi-label">ប្រាក់សន្សំសរុប</span>
+                            <div class="kpi-icon" style="background: var(--savings-bg); color: var(--savings);">🐷</div>
+                        </div>
+                        <div id="kpiTotalSav" class="kpi-val" style="color: var(--savings);">0 ៛</div>
+                        <div id="kpiSubSav" class="kpi-sub">≈ $0.00</div>
+                    </div>
+                    <div class="kpi-breakdown">
+                        <div class="kb-row">
+                            <span style="color: var(--text-muted); font-weight: 700;">គោលដៅសកម្ម</span>
+                            <span id="savGoalCount" class="kb-num">0 គោលដៅ</span>
+                        </div>
+                        <div class="kb-row">
+                            <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; padding: 3px 8px;" onclick="switchView('savings')">គ្រប់គ្រងប្រាក់សន្សំ →</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- At-a-Glance Day / Week / Month Comparison Strip -->
+            <section id="dwmStripSection" class="dwm-strip">
+                <div id="dwm-card-day" class="dwm-card" onclick="setTimeframeMode('day', true)">
+                    <div class="dwm-head">
+                        <span>📅 សង្ខេបថ្ងៃនេះ</span>
+                        <span id="dwmDayRange" class="dwm-range">ថ្ងៃនេះ</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmDayInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmDayExp">0 ៛</span></span>
+                    </div>
+                </div>
+                <div id="dwm-card-week" class="dwm-card" onclick="setTimeframeMode('week', true)">
+                    <div class="dwm-head">
+                        <span>📆 សង្ខេបសប្តាហ៍នេះ</span>
+                        <span id="dwmWeekRange" class="dwm-range">ច័ន្ទ - អាទិត្យ</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmWeekInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmWeekExp">0 ៛</span></span>
+                    </div>
+                </div>
+                <div id="dwm-card-month" class="dwm-card active-period" onclick="setTimeframeMode('month', true)">
+                    <div class="dwm-head">
+                        <span>🗓️ សង្ខេបខែនេះ</span>
+                        <span id="dwmMonthRange" class="dwm-range">ខែនេះ</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmMonthInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmMonthExp">0 ៛</span></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 1: DASHBOARD -->
+            <div id="view-dashboard" class="view-pane active">
+                <div class="dash-split">
+                    <!-- Left: Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">🕒 ប្រតិបត្តិការថ្មីៗ</h3>
+                            <div style="display: flex; gap: 6px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="switchView('transactions')">មើលទាំងអស់ →</button>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Table -->
+                        <div class="table-wrap desktop-table-only">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ប្រភេទ</th>
+                                        <th>ការទូទាត់</th>
+                                        <th>កាលបរិច្ឆេទ</th>
+                                        <th>កំណត់ចំណាំ</th>
+                                        <th style="text-align: right;">ចំនួនទឹកប្រាក់</th>
+                                        <th style="text-align: center;">កែ/លុប</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Cards -->
+                        <div id="recentMobileCards" class="mobile-tx-cards"></div>
+                    </div>
+
+                    <!-- Right: Category Breakdown & Top Savings -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🍩 សមាមាត្រចំណាយតាមប្រភេទ</h3>
+                            </div>
+                            <div id="dashCategoryBars"></div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🐷 គោលដៅប្រាក់សន្សំ</h3>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="openGoalModal()">+ បង្កើតគោលដៅ</button>
+                            </div>
+                            <div id="dashSavingsPreview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: ALL TRANSACTIONS -->
+            <div id="view-transactions" class="view-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 បញ្ជីប្រតិបត្តិការទាំងអស់</h3>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="exportCSV(true)">📥 Excel ខែនេះ</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openTxModal()">➕ កត់ត្រាថ្មី</button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center;">
+                        <input type="text" id="searchInput" class="input-control" style="flex: 2; min-width: 200px;" placeholder="🔍 ស្វែងរកកំណត់ចំណាំ ធនាគារ ឬទឹកប្រាក់ (ចុច /)..." oninput="renderAll()">
+                        
+                        <select id="paymentFilterSelect" class="input-control" style="flex: 1; min-width: 175px; font-weight: 700;" onchange="renderAll()">
+                            <option value="all">💳 គ្រប់ការទូទាត់ (សាច់ប្រាក់ + ធនាគារ)</option>
+                            <option value="cash">💵 សាច់ប្រាក់សុទ្ធ (Cash)</option>
+                            <option value="bank">🏦 គ្រប់កុងធនាគារ (All Banks)</option>
+                            <option value="bank:ABA Bank">🏦 ABA Bank</option>
+                            <option value="bank:ACLEDA Bank">🏦 អេស៊ីលីដា (ACLEDA)</option>
+                            <option value="bank:Wing Bank">🏦 Wing Bank</option>
+                            <option value="bank:Canadia Bank">🏦 កាណាឌីយ៉ា (Canadia)</option>
+                            <option value="bank:Sathapana Bank">🏦 ស្ថាបនា (Sathapana)</option>
+                            <option value="bank:AMK">🏦 AMK</option>
+                        </select>
+
+                        <div class="seg-control">
+                            <button type="button" id="seg-all" class="seg-btn active" onclick="setTypeFilter('all')">ទាំងអស់</button>
+                            <button type="button" id="seg-income" class="seg-btn" onclick="setTypeFilter('income')">ចំណូល</button>
+                            <button type="button" id="seg-expense" class="seg-btn" onclick="setTypeFilter('expense')">ចំណាយ</button>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">គ្រប់ពេល</button>
+                        <span id="txCountBadge" style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: auto;">0 ប្រតិបត្តិការ</span>
+                    </div>
+
+                    <!-- Desktop Full Table -->
+                    <div class="table-wrap desktop-table-only">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ប្រភេទ</th>
+                                    <th>កាបូបលុយ</th>
+                                    <th>វិធីសាស្ត្រទូទាត់</th>
+                                    <th>កាលបរិច្ឆេទ</th>
+                                    <th>កំណត់ចំណាំ</th>
+                                    <th style="text-align: right;">ចំនួនទឹកប្រាក់</th>
+                                    <th style="text-align: center;">សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fullTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile Full Cards -->
+                    <div id="fullMobileCards" class="mobile-tx-cards"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: MONTHLY & 12-MONTH YEARLY REPORTS -->
+            <div id="view-reports" class="view-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 របាយការណ៍សរុបប្រចាំឆ្នាំ (១២ ខែ)</h3>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="reportYearSel" class="input-control" style="width: 125px; font-weight: 700;" onchange="renderReports()"></select>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="exportCSV(false)">📥 ទាញយក Excel ទាំងអស់</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px; font-size: 12.5px; font-weight: 700; margin-bottom: 10px;">
+                        <span style="color: var(--income);">■ ចំណូលប្រចាំខែ</span>
+                        <span style="color: var(--expense);">■ ចំណាយប្រចាំខែ</span>
+                    </div>
+                    <div class="chart-box">
+                        <div id="yearlyChartGrid" class="bar-chart-grid"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📅 សរុបចំណូល-ចំណាយតាមខែនីមួយៗ (ចុចលើខែដើម្បីមើលលម្អិត)</h3>
+                    </div>
+                    <div id="monthlyReportList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: SAVINGS GOALS -->
+            <div id="view-savings" class="view-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🐷 គ្រប់គ្រងគោលដៅប្រាក់សន្សំ (Savings Goals)</h3>
+                        <button type="button" class="btn btn-primary" onclick="openGoalModal()">+ បង្កើតគោលដៅថ្មី</button>
+                    </div>
+                    <div id="fullSavingsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: SETTINGS, EXCEL/WORD IMPORT & BACKUP -->
+            <div id="view-settings" class="view-pane">
+                <div class="dash-split">
+                    <div>
+                        <!-- Currency & Exchange Rate -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 12px;">💱 រូបិយប័ណ្ណ និងអត្រាប្តូរប្រាក់</h3>
+                            <div class="grid-2">
+                                <div class="form-grp">
+                                    <label class="form-lbl">រូបិយប័ណ្ណគោល</label>
+                                    <select id="setCurrency" class="input-control" onchange="saveSettingsFromUI()">
+                                        <option value="KHR">ប្រាក់រៀល (៛)</option>
+                                        <option value="USD">ប្រាក់ដុល្លារ ($)</option>
+                                    </select>
+                                </div>
+                                <div class="form-grp">
+                                    <label class="form-lbl">អត្រាប្តូរប្រាក់ ($1 = ? ៛)</label>
+                                    <input type="number" id="setRate" class="input-control" value="4000" min="100" onchange="saveSettingsFromUI()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Multiple Wallets -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 12px;">👛 គ្រប់គ្រងកាបូបលុយ (Multiple Wallets)</h3>
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                <select id="addWalletEmoji" class="input-control" style="width: 70px; text-align: center;">
+                                    <option value="💼">💼</option>
+                                    <option value="🏠">🏠</option>
+                                    <option value="👤">👤</option>
+                                    <option value="🏦">🏦</option>
+                                    <option value="🛒">🛒</option>
+                                    <option value="✈️">✈️</option>
+                                </select>
+                                <input type="text" id="addWalletName" class="input-control" placeholder="ឈ្មោះកាបូបលុយថ្មី...">
+                                <button type="button" class="btn btn-primary" onclick="createWallet()">បន្ថែម</button>
+                            </div>
+                            <div id="settingsWalletList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+
+                        <!-- PIN Security -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 8px;">🔐 លេខកូដសម្ងាត់ការពារកម្មវិធី (4-Digit PIN)</h3>
+                            <p id="pinDescText" style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">បច្ចុប្បន្ន៖ បានបិទលេខកូដសម្ងាត់</p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <input type="password" id="pinSetupInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" class="input-control" style="width: 140px; text-align: center; letter-spacing: 6px; font-weight: 800;" placeholder="••••">
+                                <button type="button" class="btn btn-primary" onclick="enablePinLock()">កំណត់ PIN</button>
+                                <button type="button" id="btnRemovePin" class="btn btn-danger" style="display: none;" onclick="disablePinLock()">បិទ PIN</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <!-- Excel / Word Table Smart Import -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 8px;">📑 នាំចូលទិន្នន័យពី Excel (CSV) ឬ Word</h3>
+                            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
+                                ទាញយកគំរូ Excel ឬ Copy តារាងពី <strong>Microsoft Excel / Word</strong> មក Paste ចូលខាងក្រោម ប្រព័ន្ធនឹងវិភាគបំបែកជួរឈរដោយស្វ័យប្រវត្តិ។
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="downloadExcelTemplate()">⬇️ ទាញយកគំរូ Excel</button>
+                                <label class="btn btn-primary btn-sm" style="cursor: pointer;">
+                                    📂 រើសឯកសារ CSV/TXT
+                                    <input type="file" accept=".csv,.tsv,.txt" style="display: none;" onchange="handleCsvUpload(event)">
+                                </label>
+                            </div>
+                            <textarea id="smartPasteBox" rows="4" class="input-control" style="font-size: 12px; margin-bottom: 8px;" placeholder="Paste តារាងពី Excel ឬ Word នៅទីនេះ (កាលបរិច្ឆេទ | ចំណូល/ចំណាយ | ការទូទាត់ | ទឹកប្រាក់ | កំណត់ចំណាំ)..."></textarea>
+                            <button type="button" class="btn btn-income" style="width: 100%;" onclick="parseAndImportText()">⚡ វិភាគ និងបញ្ចូលទិន្នន័យស្វ័យប្រវត្តិ</button>
+                        </div>
+
+                        <!-- Backup & Restore JSON -->
+                        <div class="card">
+                            <h3 class="card-title" style="margin-bottom: 8px;">💾 បម្រុងទុក និងផ្ទេរទិន្នន័យ (Backup & Restore)</h3>
+                            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
+                                ប្រើឯកសារ JSON ដើម្បីផ្ទេរទិន្នន័យរវាង <strong>កុំព្យូទ័រ និង ទូរសព្ទដៃ</strong> ឬរក្សាទុកការពារការបាត់បង់។
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                                <button type="button" class="btn btn-primary" style="flex: 1;" onclick="exportBackupJSON()">⬇️ Backup (Export JSON)</button>
+                                <label class="btn btn-secondary" style="flex: 1; cursor: pointer;">
+                                    ⬆️ Restore (Import JSON)
+                                    <input type="file" accept=".json" style="display: none;" onchange="handleBackupUpload(event)">
+                                </label>
+                            </div>
+                            <button type="button" id="installPwaBtn" class="btn btn-secondary" style="width: 100%; display: none;" onclick="installPWA()">📲 ដំឡើងកម្មវិធីលើអេក្រង់ (Install App)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <button type="button" id="mnav-dashboard" class="m-bnav-btn active" onclick="switchView('dashboard')">
+            <span class="m-bnav-ico">🏠</span>
+            <span>ទំព័រដើម</span>
+        </button>
+        <button type="button" id="mnav-transactions" class="m-bnav-btn" onclick="switchView('transactions')">
+            <span class="m-bnav-ico">📋</span>
+            <span>ប្រតិបត្តិការ</span>
+        </button>
+        <button type="button" class="m-fab" onclick="openTxModal()" title="កត់ត្រាថ្មី">+</button>
+        <button type="button" id="mnav-reports" class="m-bnav-btn" onclick="switchView('reports')">
+            <span class="m-bnav-ico">📊</span>
+            <span>របាយការណ៍</span>
+        </button>
+        <button type="button" id="mnav-settings" class="m-bnav-btn" onclick="switchView('settings')">
+            <span class="m-bnav-ico">⚙️</span>
+            <span>ការកំណត់</span>
+        </button>
+    </nav>
+
+    <!-- MODAL 1: SINGLE TRANSACTION (CREATE / EDIT) -->
+    <div id="txModal" class="modal-overlay" onclick="if(event.target===this) closeTxModal()">
+        <div class="modal-dialog">
+            <div class="modal-head">
+                <h3 id="txModalTitle" class="modal-title">➕ កត់ត្រាចំណូល-ចំណាយថ្មី</h3>
+                <button type="button" class="modal-close" onclick="closeTxModal()">✕</button>
+            </div>
+
+            <form onsubmit="submitTxForm(event)">
+                <input type="hidden" id="editTxId">
+                <input type="hidden" id="formTxType" value="expense">
+                <input type="hidden" id="formTxCat" value="food">
+                <input type="hidden" id="formPayMethod" value="cash">
+
+                <!-- Type Switch -->
+                <div class="grid-2" style="margin-bottom: 12px;">
+                    <button type="button" id="btnFormExp" class="btn btn-danger" style="border: 2px solid var(--expense);" onclick="setFormType('expense')">↑ ចំណាយ (-)</button>
+                    <button type="button" id="btnFormInc" class="btn btn-secondary" onclick="setFormType('income')">↓ ចំណូល (+)</button>
+                </div>
+
+                <!-- Wallet & Date -->
+                <div class="grid-2">
+                    <div class="form-grp">
+                        <label class="form-lbl">កាបូបលុយ *</label>
+                        <select id="formWalletId" class="input-control" style="font-weight: 700;"></select>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">កាលបរិច្ឆេទ *</label>
+                        <input type="date" id="formDate" class="input-control" onchange="renderDailyNoteChips()" required>
+                    </div>
+                </div>
+
+                <!-- Payment Method: Cash vs Cambodian Banks -->
+                <div class="form-grp">
+                    <label class="form-lbl">វិធីសាស្ត្រទូទាត់ (សាច់ប្រាក់ ឬ កុងធនាគារ) *</label>
+                    <div class="grid-2">
+                        <button type="button" id="btnFormCash" class="btn" style="background: var(--cash-bg); color: var(--cash); border: 2px solid var(--cash);" onclick="setFormPayMethod('cash')">💵 សាច់ប្រាក់សុទ្ធ</button>
+                        <button type="button" id="btnFormBank" class="btn btn-secondary" onclick="setFormPayMethod('bank')">🏦 កុងធនាគារ (QR)</button>
+                    </div>
+                    <div id="bankSelectBox" style="display: none; margin-top: 8px;">
+                        <select id="formBankName" class="input-control" style="font-weight: 700; background: #f0f9ff;">
+                            <option value="ABA Bank">🏦 ABA Bank</option>
+                            <option value="ACLEDA Bank">🏦 អេស៊ីលីដា (ACLEDA Bank)</option>
+                            <option value="Wing Bank">🏦 Wing Bank</option>
+                            <option value="Canadia Bank">🏦 កាណាឌីយ៉ា (Canadia Bank)</option>
+                            <option value="Sathapana Bank">🏦 ស្ថាបនា (Sathapana Bank)</option>
+                            <option value="AMK">🏦 AMK</option>
+                            <option value="ធនាគារផ្សេងៗ">🏦 ធនាគារផ្សេងៗ (KHQR)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Amount & Currency + Quick Chips -->
+                <div class="form-grp">
+                    <label class="form-lbl">ចំនួនទឹកប្រាក់ *</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="formAmount" class="input-control" step="any" min="0.01" inputmode="decimal" style="font-size: 18px; font-weight: 800; flex: 1;" placeholder="0" required>
+                        <select id="formCurrency" class="input-control" style="width: 110px; font-weight: 800;" onchange="renderQuickAmountChips()">
+                            <option value="KHR">រៀល (៛)</option>
+                            <option value="USD">ដុល្លារ ($)</option>
+                        </select>
+                    </div>
+                    <div id="quickAmtChips" class="chips-row"></div>
+                </div>
+
+                <!-- Category Picker -->
+                <div class="form-grp">
+                    <label class="form-lbl">ប្រភេទមុខទំនិញ / ចំណូល *</label>
+                    <div id="formCatGrid" class="cat-picker"></div>
+                </div>
+
+                <!-- Note + Daily Quick Note Chips -->
+                <div class="form-grp">
+                    <label class="form-lbl">កំណត់ចំណាំ (ស្រេចចិត្ត)</label>
+                    <input type="text" id="formNote" class="input-control" placeholder="ឧ. ផ្ទះមិត្តភក្តិ ក, ទិញម្ហូប, ប្រាក់ខែ...">
+                    <div id="dailyNoteChips" class="chips-row"></div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 14px;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeTxModal()">បោះបង់</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">💾 រក្សាទុកទិន្នន័យ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BULK MULTI-ROW ENTRY -->
+    <div id="bulkModal" class="modal-overlay" onclick="if(event.target===this) closeBulkModal()">
+        <div class="modal-dialog xl">
+            <div class="modal-head">
+                <h3 class="modal-title">📑 កត់ត្រាម្តងច្រើនជួរ (Bulk Multi-Row Entry)</h3>
+                <button type="button" class="modal-close" onclick="closeBulkModal()">✕</button>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div>
+                    <label class="form-lbl">កាបូបលុយ</label>
+                    <select id="bulkWalletSel" class="input-control" style="font-weight: 700;"></select>
+                </div>
+                <div>
+                    <label class="form-lbl">កាលបរិច្ឆេទរួម</label>
+                    <input type="date" id="bulkDateInput" class="input-control">
+                </div>
+            </div>
+
+            <div id="bulkRowsWrap" style="max-height: 52vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="appendBulkRows(3)">+ បន្ថែម ៣ ជួរទៀត</button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeBulkModal()">បិទ</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAllBulkRows()">💾 រក្សាទុកទាំងអស់</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SAVINGS GOAL CREATE / EDIT -->
+    <div id="goalModal" class="modal-overlay" onclick="if(event.target===this) closeGoalModal()">
+        <div class="modal-dialog">
+            <div class="modal-head">
+                <h3 id="goalModalTitle" class="modal-title">🐷 បង្កើតគោលដៅប្រាក់សន្សំ</h3>
+                <button type="button" class="modal-close" onclick="closeGoalModal()">✕</button>
+            </div>
+            <form onsubmit="submitGoalForm(event)">
+                <input type="hidden" id="editGoalId">
+                <div class="form-grp">
+                    <label class="form-lbl">ឈ្មោះគោលដៅសន្សំ *</label>
+                    <input type="text" id="goalNameInp" class="input-control" placeholder="ឧ. សន្សំទិញទូរសព្ទ, លុយបម្រុងគ្រាអាសន្ន..." required>
+                </div>
+                <div class="grid-2">
+                    <div class="form-grp">
+                        <label class="form-lbl">ទឹកប្រាក់គោលដៅ *</label>
+                        <input type="number" id="goalTargetInp" class="input-control" step="any" min="1" required>
+                    </div>
+                    <div class="form-grp">
+                        <label class="form-lbl">រូបិយប័ណ្ណ</label>
+                        <select id="goalCurrInp" class="input-control">
+                            <option value="KHR">រៀល (៛)</option>
+                            <option value="USD">ដុល្លារ ($)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grp">
+                    <label class="form-lbl">ប្រាក់សន្សំមានស្រាប់</label>
+                    <input type="number" id="goalSavedInp" class="input-control" step="any" min="0" value="0">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">💾 រក្សាទុកគោលដៅ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: SAVINGS DEPOSIT / WITHDRAW -->
+    <div id="goalActionModal" class="modal-overlay" onclick="if(event.target===this) closeGoalActionModal()">
+        <div class="modal-dialog">
+            <div class="modal-head">
+                <h3 id="goalActTitle" class="modal-title">ដាក់ប្រាក់សន្សំ</h3>
+                <button type="button" class="modal-close" onclick="closeGoalActionModal()">✕</button>
+            </div>
+            <form onsubmit="submitGoalAction(event)">
+                <input type="hidden" id="goalActId">
+                <input type="hidden" id="goalActMode" value="deposit">
+                <div class="form-grp">
+                    <label class="form-lbl">ចំនួនទឹកប្រាក់ (<span id="goalActCurr">៛</span>) *</label>
+                    <input type="number" id="goalActAmt" class="input-control" step="any" min="0.01" style="font-size: 18px; font-weight: 800;" required>
+                </div>
+                <div class="form-grp">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                        <input type="checkbox" id="goalAutoSync" checked>
+                        កត់ត្រាចូលបញ្ជីចំណូល-ចំណាយដោយស្វ័យប្រវត្តិ
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">បញ្ជាក់</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 5: JSON BACKUP RESTORE (MERGE VS OVERWRITE) -->
+    <div id="mergeJsonModal" class="modal-overlay" onclick="if(event.target===this) closeMergeModal()">
+        <div class="modal-dialog">
+            <div class="modal-head">
+                <h3 class="modal-title">⬆️ ជ្រើសរើសរបៀបបញ្ចូលទិន្នន័យ Backup</h3>
+                <button type="button" class="modal-close" onclick="closeMergeModal()">✕</button>
+            </div>
+            <p id="mergeSummaryText" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;"></p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn btn-primary" onclick="executeJsonRestore('merge')">➕ បូកបញ្ចូលគ្នា (Merge - រក្សាទិន្នន័យចាស់ & បន្ថែមថ្មី)</button>
+                <button type="button" class="btn btn-danger" onclick="executeJsonRestore('overwrite')">🔄 ជំនួសទាំងស្រុង (Overwrite - លុបចាស់ដាក់ថ្មី)</button>
+                <button type="button" class="btn btn-secondary" onclick="closeMergeModal()">បោះបង់</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastBar" class="toast-bar">
+        <span id="toastText">ជោគជ័យ!</span>
+        <button type="button" id="toastUndo" style="display: none; background: #10b981; color: #fff; border: none; padding: 3px 10px; border-radius: 999px; font-weight: 800; cursor: pointer;" onclick="undoLastDelete()">ត្រឡប់វិញ (Undo)</button>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. STORAGE KEYS & CATEGORIES
+        // ==========================================
+        const KEYS = {
+            TX: 'khmer_expense_tx_v3',
+            WALLETS: 'khmer_expense_wallets_v3',
+            GOALS: 'khmer_expense_savings_v3',
+            CFG: 'khmer_expense_settings_v3'
+        };
+
+        const CATEGORIES = {
+            expense: [
+                { id: 'food', name: 'អាហារ', emoji: '🍜', bg: '#ffedd5', color: '#ea580c' },
+                { id: 'drink', name: 'ភេសជ្ជៈ/កាហ្វេ', emoji: '🧋', bg: '#fef3c7', color: '#d97706' },
+                { id: 'transport', name: 'ធ្វើដំណើរ/សាំង', emoji: '⛽', bg: '#dbeafe', color: '#2563eb' },
+                { id: 'shopping', name: 'ទិញទំនិញ', emoji: '🛍️', bg: '#fce7f3', color: '#db2777' },
+                { id: 'bills', name: 'ទឹក/ភ្លើង/អ៊ីនធឺណិត', emoji: '🧾', bg: '#e0e7ff', color: '#4f46e5' },
+                { id: 'health', name: 'សុខភាព', emoji: '💊', bg: '#dcfce7', color: '#16a34a' },
+                { id: 'social', name: 'កម្មវិធី/ជប់លៀង', emoji: '🍻', bg: '#fae8ff', color: '#c026d3' },
+                { id: 'other_exp', name: 'ចំណាយផ្សេងៗ', emoji: '📦', bg: '#f1f5f9', color: '#475569' }
+            ],
+            income: [
+                { id: 'salary', name: 'ប្រាក់ខែ', emoji: '💵', bg: '#d1fae5', color: '#059669' },
+                { id: 'business', name: 'លក់ដូរ/អាជីវកម្ម', emoji: '🏪', bg: '#ccfbf1', color: '#0f766e' },
+                { id: 'bonus', name: 'ប្រាក់រង្វាន់/ថែមម៉ោង', emoji: '🎁', bg: '#fef3c7', color: '#d97706' },
+                { id: 'other_inc', name: 'ចំណូលផ្សេងៗ', emoji: '💰', bg: '#e0f2fe', color: '#0284c7' }
+            ]
+        };
+
+        let wallets = [];
+        let transactions = [];
+        let goals = [];
+        let config = { currency: 'KHR', rate: 4000, pin: '' };
+
+        let activeWalletId = 'all';
+        let timeframeMode = 'month'; // 'day' | 'week' | 'month' | 'all'
+        let selectedDate = '';
+        let selectedMonth = '';
+        let typeFilter = 'all';
+        let deletedTxBuffer = null;
+        let pendingBackupData = null;
+        let pinBuffer = '';
+        let pwaPromptEvent = null;
+
+        // ==========================================
+        // 2. LOAD & SAVE OFFLINE DATA
+        // ==========================================
+        function loadData() {
+            try {
+                // Migrate legacy v4 keys if v3 is empty
+                const c = localStorage.getItem(KEYS.CFG) || localStorage.getItem('kh_universal_cfg_v4');
+                if (c) config = { ...config, ...JSON.parse(c) };
+
+                const w = localStorage.getItem(KEYS.WALLETS) || localStorage.getItem('kh_universal_wallets_v4');
+                if (w) {
+                    wallets = JSON.parse(w);
+                } else {
+                    wallets = [
+                        { id: 'w_personal', name: 'ផ្ទាល់ខ្លួន', emoji: '👤' },
+                        { id: 'w_family', name: 'គ្រួសារ', emoji: '🏠' },
+                        { id: 'w_work', name: 'ការងារ', emoji: '💼' }
+                    ];
+                }
+
+                const t = localStorage.getItem(KEYS.TX) || localStorage.getItem('kh_universal_tx_v4');
+                if (t) {
+                    transactions = JSON.parse(t).map(item => ({
+                        ...item,
+                        walletId: item.walletId || wallets[0].id,
+                        paymentMethod: item.paymentMethod || 'cash',
+                        bankName: item.bankName || ''
+                    }));
+                } else {
+                    const today = getToday();
+                    transactions = [
+                        { id: 'demo_1', walletId: 'w_personal', type: 'income', paymentMethod: 'bank', bankName: 'ABA Bank', amount: 2400000, currency: 'KHR', category: 'salary', date: today, note: 'ប្រាក់ខែប្រចាំខែ (គំរូ)' },
+                        { id: 'demo_2', walletId: 'w_personal', type: 'expense', paymentMethod: 'cash', bankName: '', amount: 20000, currency: 'KHR', category: 'food', date: today, note: 'អាហារថ្ងៃត្រង់' },
+                        { id: 'demo_3', walletId: 'w_work', type: 'expense', paymentMethod: 'bank', bankName: 'ACLEDA Bank', amount: 15, currency: 'USD', category: 'bills', date: today, note: 'ថ្លៃអ៊ីនធឺណិតការិយាល័យ' }
+                    ];
+                }
+
+                const g = localStorage.getItem(KEYS.GOALS) || localStorage.getItem('kh_universal_goals_v4');
+                if (g) {
+                    goals = JSON.parse(g);
+                } else {
+                    goals = [
+                        { id: 'goal_demo', name: 'លុយបម្រុងគ្រាអាសន្ន', target: 4000000, saved: 1200000, currency: 'KHR' }
+                    ];
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(KEYS.CFG, JSON.stringify(config));
+                localStorage.setItem(KEYS.WALLETS, JSON.stringify(wallets));
+                localStorage.setItem(KEYS.TX, JSON.stringify(transactions));
+                localStorage.setItem(KEYS.GOALS, JSON.stringify(goals));
+            } catch (err) {
+                notify('មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ!');
+            }
+        }
+
+        // ==========================================
+        // 3. UTILITIES
+        // ==========================================
+        function getToday() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function getWeekBounds(dateStr) {
+            const parts = (dateStr || getToday()).split('-').map(Number);
+            const d = new Date(parts[0], parts[1] - 1, parts[2]);
+            const dayOfWeek = d.getDay(); // 0 (Sun) - 6 (Sat)
+            const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const mon = new Date(d);
+            mon.setDate(d.getDate() + diffToMon);
+            const sun = new Date(mon);
+            sun.setDate(mon.getDate() + 6);
+
+            const toISO = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+            const toShort = (dt) => `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}`;
+            return {
+                start: toISO(mon),
+                end: toISO(sun),
+                label: `${toShort(mon)} - ${toShort(sun)}/${sun.getFullYear()}`
+            };
+        }
+
+        function matchesTimeframe(txDate) {
+            if (!txDate) return false;
+            if (timeframeMode === 'all') return true;
+            if (timeframeMode === 'day') return txDate === selectedDate;
+            if (timeframeMode === 'week') {
+                const wb = getWeekBounds(selectedDate);
+                return txDate >= wb.start && txDate <= wb.end;
+            }
+            return txDate.startsWith(selectedMonth);
+        }
+
+        function esc(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function convertAmt(amount, fromCurr, toCurr) {
+            const v = Number(amount) || 0;
+            if (fromCurr === toCurr) return v;
+            const r = Number(config.rate) || 4000;
+            return fromCurr === 'USD' ? v * r : v / r;
+        }
+
+        function fmtMoney(amount, curr) {
+            const v = Number(amount) || 0;
+            if (curr === 'USD') {
+                return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            return Math.round(v).toLocaleString('en-US') + ' ៛';
+        }
+
+        function fmtKhDate(dateStr) {
+            if (!dateStr) return '';
+            const p = dateStr.split('-');
+            if (p.length !== 3) return dateStr;
+            const months = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+            return `${parseInt(p[2], 10)} ${months[parseInt(p[1], 10) - 1] || p[1]} ${p[0]}`;
+        }
+
+        function getCat(type, id) {
+            const list = CATEGORIES[type] || CATEGORIES.expense;
+            return list.find(c => c.id === id) || list[list.length - 1];
+        }
+
+        function getWallet(id) {
+            return wallets.find(w => w.id === id) || wallets[0] || { id: 'w_def', name: 'ផ្ទាល់ខ្លួន', emoji: '👤' };
+        }
+
+        // ==========================================
+        // 4. NAVIGATION & SYNC CONTROLS
+        // ==========================================
+        function switchView(viewName) {
+            document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+            const pane = document.getElementById('view-' + viewName);
+            if (pane) pane.classList.add('active');
+
+            document.querySelectorAll('.s-nav-btn, .m-bnav-btn').forEach(b => b.classList.remove('active'));
+            const sBtn = document.getElementById('snav-' + viewName);
+            const mBtn = document.getElementById('mnav-' + viewName);
+            if (sBtn) sBtn.classList.add('active');
+            if (mBtn) mBtn.classList.add('active');
+
+            const kpiSec = document.getElementById('kpiGridSection');
+            const tfSec = document.getElementById('timeframeBarSection');
+            const dwmSec = document.getElementById('dwmStripSection');
+            const showSummary = (viewName === 'dashboard' || viewName === 'transactions');
+            if (kpiSec) kpiSec.style.display = showSummary ? 'grid' : 'none';
+            if (tfSec) tfSec.style.display = showSummary ? 'flex' : 'none';
+            if (dwmSec) dwmSec.style.display = (viewName === 'dashboard') ? 'grid' : 'none';
+
+            if (viewName === 'reports') renderReports();
+            if (viewName === 'savings') renderSavingsViews();
+            if (viewName === 'settings') renderSettings();
+        }
+
+        function setTimeframeMode(mode, resetToToday = false) {
+            timeframeMode = mode;
+            if (resetToToday) {
+                selectedDate = getToday();
+                selectedMonth = selectedDate.slice(0, 7);
+                document.getElementById('tfDateInput').value = selectedDate;
+                document.getElementById('tfMonthInput').value = selectedMonth;
+            }
+
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById('tf-' + mode);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.querySelectorAll('.dwm-card').forEach(c => c.classList.remove('active-period'));
+            const activeCard = document.getElementById('dwm-card-' + mode);
+            if (activeCard) activeCard.classList.add('active-period');
+
+            const dInp = document.getElementById('tfDateInput');
+            const mInp = document.getElementById('tfMonthInput');
+            dInp.style.display = (mode === 'day' || mode === 'week') ? 'block' : 'none';
+            mInp.style.display = (mode === 'month') ? 'block' : 'none';
+
+            renderAll();
+        }
+
+        function onTimeframePickerChange() {
+            selectedDate = document.getElementById('tfDateInput').value || getToday();
+            selectedMonth = document.getElementById('tfMonthInput').value || getToday().slice(0, 7);
+            renderAll();
+        }
+
+        function renderWalletPills() {
+            const html = `<button type="button" class="w-pill ${activeWalletId === 'all' ? 'active' : ''}" onclick="chooseWallet('all')">🌐 ទាំងអស់</button>` +
+                wallets.map(w => `<button type="button" class="w-pill ${activeWalletId === w.id ? 'active' : ''}" onclick="chooseWallet('${w.id}')">${w.emoji} ${esc(w.name)}</button>`).join('');
+            document.getElementById('desktopWalletPills').innerHTML = html;
+            document.getElementById('mobileWalletPills').innerHTML = html;
+        }
+
+        function chooseWallet(id) {
+            activeWalletId = id;
+            renderWalletPills();
+            renderAll();
+        }
+
+        function toggleBaseCurrency() {
+            config.currency = config.currency === 'KHR' ? 'USD' : 'KHR';
+            saveData();
+            updateCurrencyButtons();
+            renderAll();
+            notify(`ប្តូរការបង្ហាញទៅជា ${config.currency === 'KHR' ? 'ប្រាក់រៀល (៛)' : 'ប្រាក់ដុល្លារ ($)'}`);
+        }
+
+        function updateCurrencyButtons() {
+            document.getElementById('dCurrBtn').textContent = config.currency === 'KHR' ? '💱 ប្រាក់រៀល (៛)' : '💱 ប្រាក់ដុល្លារ ($)';
+            document.getElementById('mCurrBtn').textContent = config.currency === 'KHR' ? '៛' : '$';
+        }
+
+        // ==========================================
+        // 5. MAIN DASHBOARD & TRANSACTIONS RENDER
+        // ==========================================
+        function renderAll() {
+            const todayStr = getToday();
+            const currentWeek = getWeekBounds(todayStr);
+            const currentMonthStr = todayStr.slice(0, 7);
+
+            // Update timeframe badge & balance card title
+            const badge = document.getElementById('tfRangeBadge');
+            if (timeframeMode === 'day') {
+                const lbl = selectedDate === todayStr ? `ថ្ងៃនេះ (${fmtKhDate(selectedDate)})` : fmtKhDate(selectedDate);
+                badge.textContent = `📅 ${lbl}`;
+                document.getElementById('balTitleLbl').textContent = `សមតុល្យ (${selectedDate === todayStr ? 'ថ្ងៃនេះ' : fmtKhDate(selectedDate)})`;
+            } else if (timeframeMode === 'week') {
+                const wb = getWeekBounds(selectedDate);
+                badge.textContent = `📆 សប្តាហ៍៖ ${wb.label}`;
+                document.getElementById('balTitleLbl').textContent = `សមតុល្យសប្តាហ៍ (${wb.label})`;
+            } else if (timeframeMode === 'month') {
+                badge.textContent = `🗓️ ខែ ${selectedMonth}`;
+                document.getElementById('balTitleLbl').textContent = `សមតុល្យប្រចាំខែ (${selectedMonth})`;
+            } else {
+                badge.textContent = '🌐 គ្រប់ពេលទាំងអស់';
+                document.getElementById('balTitleLbl').textContent = 'សមតុល្យសរុប (គ្រប់ពេល)';
+            }
+
+            // Compute At-a-Glance Day / Week / Month Strip (filtered by active wallet)
+            let dInc = 0, dExp = 0, wInc = 0, wExp = 0, mInc = 0, mExp = 0;
+            transactions.forEach(tx => {
+                if (activeWalletId !== 'all' && tx.walletId !== activeWalletId) return;
+                const amt = convertAmt(tx.amount, tx.currency, config.currency);
+                if (tx.date === todayStr) {
+                    if (tx.type === 'income') dInc += amt; else dExp += amt;
+                }
+                if (tx.date >= currentWeek.start && tx.date <= currentWeek.end) {
+                    if (tx.type === 'income') wInc += amt; else wExp += amt;
+                }
+                if (tx.date && tx.date.startsWith(currentMonthStr)) {
+                    if (tx.type === 'income') mInc += amt; else mExp += amt;
+                }
+            });
+
+            document.getElementById('dwmDayRange').textContent = fmtKhDate(todayStr);
+            document.getElementById('dwmDayInc').textContent = fmtMoney(dInc, config.currency);
+            document.getElementById('dwmDayExp').textContent = fmtMoney(dExp, config.currency);
+
+            document.getElementById('dwmWeekRange').textContent = currentWeek.label;
+            document.getElementById('dwmWeekInc').textContent = fmtMoney(wInc, config.currency);
+            document.getElementById('dwmWeekExp').textContent = fmtMoney(wExp, config.currency);
+
+            document.getElementById('dwmMonthRange').textContent = currentMonthStr;
+            document.getElementById('dwmMonthInc').textContent = fmtMoney(mInc, config.currency);
+            document.getElementById('dwmMonthExp').textContent = fmtMoney(mExp, config.currency);
+
+            // Active Period Transactions
+            const periodTx = transactions.filter(tx => {
+                if (activeWalletId !== 'all' && tx.walletId !== activeWalletId) return false;
+                if (!matchesTimeframe(tx.date)) return false;
+                return true;
+            });
+
+            let sumInc = 0, sumExp = 0;
+            let incCash = 0, incBank = 0;
+            let expCash = 0, expBank = 0;
+            const catMap = {};
+
+            periodTx.forEach(tx => {
+                const amt = convertAmt(tx.amount, tx.currency, config.currency);
+                const isBank = tx.paymentMethod === 'bank';
+                if (tx.type === 'income') {
+                    sumInc += amt;
+                    if (isBank) incBank += amt; else incCash += amt;
+                } else {
+                    sumExp += amt;
+                    if (isBank) expBank += amt; else expCash += amt;
+                    catMap[tx.category] = (catMap[tx.category] || 0) + amt;
+                }
+            });
+
+            const bal = sumInc - sumExp;
+            const balCash = incCash - expCash;
+            const balBank = incBank - expBank;
+            const secCurr = config.currency === 'KHR' ? 'USD' : 'KHR';
+            const dual = (v) => `${fmtMoney(v, config.currency)} ≈ ${fmtMoney(convertAmt(v, config.currency, secCurr), secCurr)}`;
+
+            document.getElementById('kpiTotalBal').textContent = fmtMoney(bal, config.currency);
+            document.getElementById('kpiSubBal').textContent = `≈ ${fmtMoney(convertAmt(bal, config.currency, secCurr), secCurr)}`;
+            document.getElementById('balCashNum').textContent = dual(balCash);
+            document.getElementById('balBankNum').textContent = dual(balBank);
+
+            document.getElementById('kpiTotalInc').textContent = fmtMoney(sumInc, config.currency);
+            document.getElementById('kpiSubInc').textContent = `≈ ${fmtMoney(convertAmt(sumInc, config.currency, secCurr), secCurr)}`;
+            document.getElementById('incCashNum').textContent = dual(incCash);
+            document.getElementById('incBankNum').textContent = dual(incBank);
+
+            document.getElementById('kpiTotalExp').textContent = fmtMoney(sumExp, config.currency);
+            document.getElementById('kpiSubExp').textContent = `≈ ${fmtMoney(convertAmt(sumExp, config.currency, secCurr), secCurr)}`;
+            document.getElementById('expCashNum').textContent = dual(expCash);
+            document.getElementById('expBankNum').textContent = dual(expBank);
+
+            // Savings Total KPI
+            let totalSav = 0;
+            goals.forEach(g => { totalSav += convertAmt(g.saved, g.currency, config.currency); });
+            document.getElementById('kpiTotalSav').textContent = fmtMoney(totalSav, config.currency);
+            document.getElementById('kpiSubSav').textContent = `≈ ${fmtMoney(convertAmt(totalSav, config.currency, secCurr), secCurr)}`;
+            document.getElementById('savGoalCount').textContent = `${goals.length} គោលដៅ`;
+
+            // Sort newest first
+            const sorted = [...periodTx].sort((a, b) => b.date.localeCompare(a.date));
+
+            // Recent 6
+            renderDesktopTable('recentTableBody', sorted.slice(0, 6), false);
+            renderMobileCards('recentMobileCards', sorted.slice(0, 6));
+
+            // Filtered Full List
+            const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            const payFilter = document.getElementById('paymentFilterSelect')?.value || 'all';
+
+            const filtered = sorted.filter(tx => {
+                if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
+                if (payFilter === 'cash' && (tx.paymentMethod || 'cash') !== 'cash') return false;
+                if (payFilter === 'bank' && tx.paymentMethod !== 'bank') return false;
+                if (payFilter.startsWith('bank:')) {
+                    const reqBank = payFilter.split(':')[1];
+                    if (tx.paymentMethod !== 'bank' || tx.bankName !== reqBank) return false;
+                }
+                if (q) {
+                    const c = getCat(tx.type, tx.category);
+                    return (tx.note || '').toLowerCase().includes(q) ||
+                           c.name.toLowerCase().includes(q) ||
+                           (tx.bankName || '').toLowerCase().includes(q) ||
+                           String(tx.amount).includes(q);
+                }
+                return true;
+            });
+
+            document.getElementById('txCountBadge').textContent = `${filtered.length} ប្រតិបត្តិការ`;
+            renderDesktopTable('fullTableBody', filtered, true);
+            renderMobileCards('fullMobileCards', filtered);
+
+            renderCategoryBars(catMap, sumExp);
+            renderSavingsViews();
+        }
+
+        function renderDesktopTable(tbodyId, list, includeWalletCol) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            const colSpan = includeWalletCol ? 7 : 6;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align: center; padding: 28px; color: var(--text-muted);">📭 មិនទាន់មានប្រតិបត្តិការនៅឡើយទេ</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(tx => {
+                const cat = getCat(tx.type, tx.category);
+                const w = getWallet(tx.walletId);
+                const isInc = tx.type === 'income';
+                const isBank = tx.paymentMethod === 'bank';
+                const payTag = isBank
+                    ? `<span class="tag-pill" style="background: var(--bank-bg); color: var(--bank);">🏦 ${esc(tx.bankName || 'កុងធនាគារ')}</span>`
+                    : `<span class="tag-pill" style="background: var(--cash-bg); color: var(--cash);">💵 សាច់ប្រាក់</span>`;
+                const conv = convertAmt(tx.amount, tx.currency, config.currency);
+                const showSub = tx.currency !== config.currency;
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                                <span style="width: 30px; height: 30px; border-radius: 8px; background: ${cat.bg}; display: inline-flex; align-items: center; justify-content: center;">${cat.emoji}</span>
+                                <span>${cat.name}</span>
+                            </div>
+                        </td>
+                        ${includeWalletCol ? `<td><span class="tag-pill" style="background: #f1f5f9;">${w.emoji} ${esc(w.name)}</span></td>` : ''}
+                        <td>${payTag}</td>
+                        <td style="white-space: nowrap; color: var(--text-muted);">${fmtKhDate(tx.date)}</td>
+                        <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${esc(tx.note) || '—'}</td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <div style="font-weight: 800; color: ${isInc ? 'var(--income)' : 'var(--expense)'};">${isInc ? '+' : '-'}${fmtMoney(tx.amount, tx.currency)}</div>
+                            ${showSub ? `<div style="font-size: 11px; color: var(--text-muted);">≈ ${fmtMoney(conv, config.currency)}</div>` : ''}
+                        </td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button type="button" class="icon-action" onclick="openTxModal('${tx.id}')" title="កែប្រែ">✏️</button>
+                            <button type="button" class="icon-action" onclick="deleteTx('${tx.id}')" title="លុប">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderMobileCards(containerId, list) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+
+            if (list.length === 0) {
+                el.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">📭 មិនទាន់មានប្រតិបត្តិការនៅឡើយទេ</div>`;
+                return;
+            }
+
+            el.innerHTML = list.map(tx => {
+                const cat = getCat(tx.type, tx.category);
+                const w = getWallet(tx.walletId);
+                const isInc = tx.type === 'income';
+                const isBank = tx.paymentMethod === 'bank';
+                const payTag = isBank
+                    ? `<span class="tag-pill" style="background: var(--bank-bg); color: var(--bank);">🏦 ${esc(tx.bankName || 'ធនាគារ')}</span>`
+                    : `<span class="tag-pill" style="background: var(--cash-bg); color: var(--cash);">💵 សាច់ប្រាក់</span>`;
+                const wTag = activeWalletId === 'all' ? `<span class="tag-pill" style="background: #f1f5f9;">${w.emoji} ${esc(w.name)}</span>` : '';
+                const conv = convertAmt(tx.amount, tx.currency, config.currency);
+                const showSub = tx.currency !== config.currency;
+
+                return `
+                    <div class="m-tx-card">
+                        <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                            <div style="width: 40px; height: 40px; border-radius: 12px; background: ${cat.bg}; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">${cat.emoji}</div>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-weight: 800; font-size: 13.5px;">
+                                    <span>${cat.name}</span>
+                                    ${payTag}
+                                    ${wTag}
+                                </div>
+                                ${tx.note ? `<div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(tx.note)}</div>` : ''}
+                                <div style="font-size: 11px; color: #94a3b8;">${fmtKhDate(tx.date)}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right; flex-shrink: 0;">
+                            <div style="font-weight: 800; font-size: 14px; color: ${isInc ? 'var(--income)' : 'var(--expense)'};">${isInc ? '+' : '-'}${fmtMoney(tx.amount, tx.currency)}</div>
+                            ${showSub ? `<div style="font-size: 10.5px; color: var(--text-muted);">≈ ${fmtMoney(conv, config.currency)}</div>` : ''}
+                            <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: 4px;">
+                                <button type="button" class="icon-action" onclick="openTxModal('${tx.id}')">✏️</button>
+                                <button type="button" class="icon-action" onclick="deleteTx('${tx.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCategoryBars(catMap, totalExp) {
+            const el = document.getElementById('dashCategoryBars');
+            const entries = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+
+            if (entries.length === 0 || totalExp <= 0) {
+                el.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;">មិនទាន់មានទិន្នន័យចំណាយសម្រាប់វិភាគ</div>`;
+                return;
+            }
+
+            el.innerHTML = entries.map(([catId, val]) => {
+                const c = getCat('expense', catId);
+                const pct = Math.min(100, Math.round((val / totalExp) * 100));
+                return `
+                    <div class="prog-row">
+                        <div class="prog-top">
+                            <span>${c.emoji} ${c.name} (${pct}%)</span>
+                            <span>${fmtMoney(val, config.currency)}</span>
+                        </div>
+                        <div class="prog-track">
+                            <div class="prog-fill" style="width: ${pct}%; background: ${c.color};"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setTypeFilter(t) {
+            typeFilter = t;
+            document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('seg-' + t).classList.add('active');
+            renderAll();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('paymentFilterSelect').value = 'all';
+            setTypeFilter('all');
+            setTimeframeMode('all');
+            notify('បង្ហាញទិន្នន័យគ្រប់ពេលទាំងអស់');
+        }
+
+        // ==========================================
+        // 6. CRUD MODAL & DAILY QUICK NOTE CHIPS
+        // ==========================================
+        function openTxModal(editId = '') {
+            document.getElementById('editTxId').value = editId;
+            const wSel = document.getElementById('formWalletId');
+            wSel.innerHTML = wallets.map(w => `<option value="${w.id}">${w.emoji} ${esc(w.name)}</option>`).join('');
+
+            if (editId) {
+                const tx = transactions.find(x => x.id === editId);
+                if (!tx) return;
+                document.getElementById('txModalTitle').textContent = '✏️ កែប្រែប្រតិបត្តិការ';
+                wSel.value = tx.walletId;
+                document.getElementById('formDate').value = tx.date;
+                document.getElementById('formAmount').value = tx.amount;
+                document.getElementById('formCurrency').value = tx.currency;
+                document.getElementById('formNote').value = tx.note || '';
+                setFormType(tx.type, tx.category);
+                setFormPayMethod(tx.paymentMethod || 'cash', tx.bankName || 'ABA Bank');
+            } else {
+                document.getElementById('txModalTitle').textContent = '➕ កត់ត្រាចំណូល-ចំណាយថ្មី';
+                wSel.value = activeWalletId !== 'all' ? activeWalletId : wallets[0].id;
+                document.getElementById('formDate').value = getToday();
+                document.getElementById('formAmount').value = '';
+                document.getElementById('formCurrency').value = config.currency;
+                document.getElementById('formNote').value = '';
+                setFormType('expense', 'food');
+                setFormPayMethod('cash', 'ABA Bank');
+            }
+
+            renderQuickAmountChips();
+            renderDailyNoteChips();
+            document.getElementById('txModal').classList.add('open');
+        }
+
+        function closeTxModal() {
+            document.getElementById('txModal').classList.remove('open');
+        }
+
+        function setFormType(type, selectedCat = null) {
+            document.getElementById('formTxType').value = type;
+            const bExp = document.getElementById('btnFormExp');
+            const bInc = document.getElementById('btnFormInc');
+
+            if (type === 'income') {
+                bInc.className = 'btn btn-income';
+                bInc.style.border = '2px solid var(--income)';
+                bExp.className = 'btn btn-secondary';
+                bExp.style.border = '1px solid var(--border)';
+            } else {
+                bExp.className = 'btn btn-danger';
+                bExp.style.border = '2px solid var(--expense)';
+                bInc.className = 'btn btn-secondary';
+                bInc.style.border = '1px solid var(--border)';
+            }
+
+            const cats = CATEGORIES[type];
+            const activeCat = selectedCat && cats.some(c => c.id === selectedCat) ? selectedCat : cats[0].id;
+            document.getElementById('formTxCat').value = activeCat;
+
+            document.getElementById('formCatGrid').innerHTML = cats.map(c => `
+                <div class="cat-opt ${c.id === activeCat ? 'selected' : ''}" onclick="pickCat('${c.id}', this)">
+                    <span style="font-size: 20px; display: block;">${c.emoji}</span>
+                    <span style="font-size: 11px; font-weight: 700; display: block; margin-top: 2px;">${c.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function pickCat(catId, el) {
+            document.getElementById('formTxCat').value = catId;
+            document.querySelectorAll('.cat-opt').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function setFormPayMethod(method, bankName = null) {
+            document.getElementById('formPayMethod').value = method;
+            const bCash = document.getElementById('btnFormCash');
+            const bBank = document.getElementById('btnFormBank');
+            const bankBox = document.getElementById('bankSelectBox');
+
+            if (method === 'bank') {
+                bBank.style.background = 'var(--bank-bg)';
+                bBank.style.color = 'var(--bank)';
+                bBank.style.border = '2px solid var(--bank)';
+                bCash.style.background = '#f1f5f9';
+                bCash.style.color = 'var(--text)';
+                bCash.style.border = '1px solid var(--border)';
+                bankBox.style.display = 'block';
+                if (bankName) document.getElementById('formBankName').value = bankName;
+            } else {
+                bCash.style.background = 'var(--cash-bg)';
+                bCash.style.color = 'var(--cash)';
+                bCash.style.border = '2px solid var(--cash)';
+                bBank.style.background = '#f1f5f9';
+                bBank.style.color = 'var(--text)';
+                bBank.style.border = '1px solid var(--border)';
+                bankBox.style.display = 'none';
+            }
+        }
+
+        function renderQuickAmountChips() {
+            const curr = document.getElementById('formCurrency').value;
+            const presets = curr === 'KHR' ? [5000, 10000, 20000, 50000, 100000] : [1, 5, 10, 20, 50];
+            document.getElementById('quickAmtChips').innerHTML = presets.map(v => `
+                <button type="button" class="chip" onclick="plusAmount(${v})">+${curr === 'KHR' ? v.toLocaleString() + '៛' : '$' + v}</button>
+            `).join('');
+        }
+
+        function plusAmount(val) {
+            const inp = document.getElementById('formAmount');
+            inp.value = (parseFloat(inp.value) || 0) + val;
+        }
+
+        function renderDailyNoteChips() {
+            const dateStr = document.getElementById('formDate').value;
+            const box = document.getElementById('dailyNoteChips');
+            if (!dateStr) { box.innerHTML = ''; return; }
+
+            const uniqueNotes = new Set();
+            transactions.forEach(tx => {
+                if (tx.date === dateStr && tx.note && tx.note.trim()) {
+                    uniqueNotes.add(tx.note.trim());
+                }
+            });
+
+            if (uniqueNotes.size === 0) {
+                box.innerHTML = '';
+                return;
+            }
+
+            box.innerHTML = Array.from(uniqueNotes).map(n => `
+                <button type="button" class="chip note" onclick="fillNote('${esc(n).replace(/'/g, "\\'")}')">📝 ${esc(n)}</button>
+            `).join('');
+        }
+
+        function fillNote(txt) {
+            document.getElementById('formNote').value = txt;
+        }
+
+        function submitTxForm(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editTxId').value;
+            const walletId = document.getElementById('formWalletId').value || wallets[0].id;
+            const type = document.getElementById('formTxType').value;
+            const paymentMethod = document.getElementById('formPayMethod').value;
+            const bankName = paymentMethod === 'bank' ? document.getElementById('formBankName').value : '';
+            const amount = parseFloat(document.getElementById('formAmount').value);
+            const currency = document.getElementById('formCurrency').value;
+            const category = document.getElementById('formTxCat').value;
+            const date = document.getElementById('formDate').value;
+            const note = document.getElementById('formNote').value.trim();
+
+            if (!amount || amount <= 0 || !date) return;
+
+            if (editId) {
+                const idx = transactions.findIndex(t => t.id === editId);
+                if (idx !== -1) {
+                    transactions[idx] = { ...transactions[idx], walletId, type, paymentMethod, bankName, amount, currency, category, date, note };
+                }
+                notify('បានកែប្រែប្រតិបត្តិការជោគជ័យ!');
+            } else {
+                transactions.unshift({
+                    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    walletId, type, paymentMethod, bankName, amount, currency, category, date, note
+                });
+                notify('បានកត់ត្រាទិន្នន័យថ្មីជោគជ័យ!');
+            }
+
+            saveData();
+            closeTxModal();
+            renderAll();
+        }
+
+        function deleteTx(id) {
+            const idx = transactions.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            deletedTxBuffer = transactions[idx];
+            transactions.splice(idx, 1);
+            saveData();
+            renderAll();
+            notify('បានលុបប្រតិបត្តិការរួចរាល់', true);
+        }
+
+        function undoLastDelete() {
+            if (!deletedTxBuffer) return;
+            transactions.unshift(deletedTxBuffer);
+            deletedTxBuffer = null;
+            saveData();
+            renderAll();
+            hideToast();
+            notify('បានទាញទិន្នន័យត្រឡប់មកវិញ!');
+        }
+
+        // ==========================================
+        // 7. BULK MULTI-ROW ENTRY
+        // ==========================================
+        function openBulkModal() {
+            const wSel = document.getElementById('bulkWalletSel');
+            wSel.innerHTML = wallets.map(w => `<option value="${w.id}">${w.emoji} ${esc(w.name)}</option>`).join('');
+            wSel.value = activeWalletId !== 'all' ? activeWalletId : wallets[0].id;
+            document.getElementById('bulkDateInput').value = getToday();
+
+            document.getElementById('bulkRowsWrap').innerHTML = '';
+            appendBulkRows(5);
+            document.getElementById('bulkModal').classList.add('open');
+        }
+
+        function closeBulkModal() {
+            document.getElementById('bulkModal').classList.remove('open');
+        }
+
+        function catOptionsHTML(type) {
+            return (CATEGORIES[type] || CATEGORIES.expense).map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+        }
+
+        function appendBulkRows(count = 3) {
+            const wrap = document.getElementById('bulkRowsWrap');
+            for (let i = 0; i < count; i++) {
+                const row = document.createElement('div');
+                row.className = 'bulk-item-row';
+                row.style.cssText = 'border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: #f8fafc;';
+                row.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px;">
+                        <select class="input-control bk-type" style="padding: 7px; font-size: 12.5px; font-weight: 700;" onchange="this.closest('.bulk-item-row').querySelector('.bk-cat').innerHTML = catOptionsHTML(this.value)">
+                            <option value="expense">↑ ចំណាយ</option>
+                            <option value="income">↓ ចំណូល</option>
+                        </select>
+                        <select class="input-control bk-cat" style="padding: 7px; font-size: 12.5px;">
+                            ${catOptionsHTML('expense')}
+                        </select>
+                        <select class="input-control bk-pay" style="padding: 7px; font-size: 12.5px; font-weight: 700;">
+                            <option value="cash">💵 សាច់ប្រាក់</option>
+                            <option value="bank:ABA Bank">🏦 ABA Bank</option>
+                            <option value="bank:ACLEDA Bank">🏦 អេស៊ីលីដា</option>
+                            <option value="bank:Wing Bank">🏦 Wing Bank</option>
+                            <option value="bank:Canadia Bank">🏦 កាណាឌីយ៉ា</option>
+                            <option value="bank:ធនាគារផ្សេងៗ">🏦 ធនាគារផ្សេងៗ</option>
+                        </select>
+                        <div style="display: flex; gap: 4px;">
+                            <input type="number" class="input-control bk-amt" step="any" min="0" placeholder="ទឹកប្រាក់ *" style="padding: 7px; font-weight: 800; flex: 1;">
+                            <select class="input-control bk-curr" style="width: 62px; padding: 7px; font-weight: 700;">
+                                <option value="KHR" ${config.currency === 'KHR' ? 'selected' : ''}>៛</option>
+                                <option value="USD" ${config.currency === 'USD' ? 'selected' : ''}>$</option>
+                            </select>
+                        </div>
+                        <input type="text" class="input-control bk-note" placeholder="កំណត់ចំណាំ..." style="padding: 7px;">
+                    </div>
+                `;
+                wrap.appendChild(row);
+            }
+        }
+
+        function saveAllBulkRows() {
+            const walletId = document.getElementById('bulkWalletSel').value || wallets[0].id;
+            const date = document.getElementById('bulkDateInput').value || getToday();
+            const rows = document.querySelectorAll('#bulkRowsWrap .bulk-item-row');
+            let count = 0;
+
+            rows.forEach((r, idx) => {
+                const amount = parseFloat(r.querySelector('.bk-amt').value);
+                if (!amount || amount <= 0) return;
+
+                const type = r.querySelector('.bk-type').value;
+                const category = r.querySelector('.bk-cat').value;
+                const payVal = r.querySelector('.bk-pay').value;
+                const paymentMethod = payVal.startsWith('bank:') ? 'bank' : 'cash';
+                const bankName = payVal.startsWith('bank:') ? payVal.split(':')[1] : '';
+                const currency = r.querySelector('.bk-curr').value;
+                const note = r.querySelector('.bk-note').value.trim();
+
+                transactions.unshift({
+                    id: 'tx_' + Date.now() + '_' + idx + '_' + Math.random().toString(36).slice(2, 5),
+                    walletId, type, paymentMethod, bankName, amount, currency, category, date, note
+                });
+                count++;
+            });
+
+            if (count === 0) {
+                notify('សូមបញ្ចូលចំនួនទឹកប្រាក់យ៉ាងតិច ១ ជួរ!');
+                return;
+            }
+
+            saveData();
+            closeBulkModal();
+            renderAll();
+            notify(`បានរក្សាទុកចំនួន ${count} ប្រតិបត្តិការជោគជ័យ!`);
+        }
+
+        // ==========================================
+        // 8. SAVINGS GOALS
+        // ==========================================
+        function renderSavingsViews() {
+            const html = goals.length === 0
+                ? `<div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 13px;">មិនទាន់មានគោលដៅប្រាក់សន្សំនៅឡើយទេ</div>`
+                : goals.map(g => {
+                    const pct = g.target > 0 ? Math.min(100, Math.round((g.saved / g.target) * 100)) : 0;
+                    const rem = Math.max(0, g.target - g.saved);
+                    return `
+                        <div style="border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: #f8fafc; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 14.5px;">🐷 ${esc(g.name)}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">សន្សំបាន៖ <strong>${fmtMoney(g.saved, g.currency)}</strong> / ${fmtMoney(g.target, g.currency)} (${pct}%)</div>
+                                    <div style="font-size: 11.5px; color: var(--primary);">នៅខ្វះ៖ ${fmtMoney(rem, g.currency)}</div>
+                                </div>
+                                <div style="display: flex; gap: 4px;">
+                                    <button type="button" class="icon-action" onclick="openGoalModal('${g.id}')">✏️</button>
+                                    <button type="button" class="icon-action" onclick="deleteGoal('${g.id}')">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="prog-track" style="margin-bottom: 10px;">
+                                <div class="prog-fill" style="width: ${pct}%; background: var(--savings);"></div>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button type="button" class="btn btn-income btn-sm" style="flex: 1;" onclick="openGoalActionModal('${g.id}', 'deposit')">+ ដាក់សន្សំ</button>
+                                <button type="button" class="btn btn-danger btn-sm" style="flex: 1;" onclick="openGoalActionModal('${g.id}', 'withdraw')">- ដកប្រាក់</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            const dashEl = document.getElementById('dashSavingsPreview');
+            const fullEl = document.getElementById('fullSavingsList');
+            if (dashEl) dashEl.innerHTML = html;
+            if (fullEl) fullEl.innerHTML = html;
+        }
+
+        function openGoalModal(editId = '') {
+            document.getElementById('editGoalId').value = editId;
+            if (editId) {
+                const g = goals.find(x => x.id === editId);
+                if (!g) return;
+                document.getElementById('goalModalTitle').textContent = '✏️ កែប្រែគោលដៅប្រាក់សន្សំ';
+                document.getElementById('goalNameInp').value = g.name;
+                document.getElementById('goalTargetInp').value = g.target;
+                document.getElementById('goalCurrInp').value = g.currency;
+                document.getElementById('goalSavedInp').value = g.saved;
+            } else {
+                document.getElementById('goalModalTitle').textContent = '🐷 បង្កើតគោលដៅប្រាក់សន្សំថ្មី';
+                document.getElementById('goalNameInp').value = '';
+                document.getElementById('goalTargetInp').value = '';
+                document.getElementById('goalCurrInp').value = config.currency;
+                document.getElementById('goalSavedInp').value = 0;
+            }
+            document.getElementById('goalModal').classList.add('open');
+        }
+
+        function closeGoalModal() { document.getElementById('goalModal').classList.remove('open'); }
+
+        function submitGoalForm(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editGoalId').value;
+            const name = document.getElementById('goalNameInp').value.trim();
+            const target = parseFloat(document.getElementById('goalTargetInp').value);
+            const currency = document.getElementById('goalCurrInp').value;
+            const saved = parseFloat(document.getElementById('goalSavedInp').value) || 0;
+
+            if (!name || !target || target <= 0) return;
+
+            if (editId) {
+                const idx = goals.findIndex(x => x.id === editId);
+                if (idx !== -1) goals[idx] = { ...goals[idx], name, target, currency, saved };
+                notify('បានកែប្រែគោលដៅប្រាក់សន្សំ!');
+            } else {
+                goals.push({ id: 'goal_' + Date.now(), name, target, currency, saved });
+                notify('បានបង្កើតគោលដៅប្រាក់សន្សំថ្មី!');
+            }
+            saveData();
+            closeGoalModal();
+            renderAll();
+        }
+
+        function deleteGoal(id) {
+            goals = goals.filter(g => g.id !== id);
+            saveData();
+            renderAll();
+            notify('បានលុបគោលដៅសន្សំ');
+        }
+
+        function openGoalActionModal(goalId, mode) {
+            const g = goals.find(x => x.id === goalId);
+            if (!g) return;
+            document.getElementById('goalActId').value = goalId;
+            document.getElementById('goalActMode').value = mode;
+            document.getElementById('goalActTitle').textContent = mode === 'deposit' ? `➕ ដាក់សន្សំ៖ ${g.name}` : `➖ ដកប្រាក់ពី៖ ${g.name}`;
+            document.getElementById('goalActCurr').textContent = g.currency === 'KHR' ? '៛' : '$';
+            document.getElementById('goalActAmt').value = '';
+            document.getElementById('goalActionModal').classList.add('open');
+        }
+
+        function closeGoalActionModal() { document.getElementById('goalActionModal').classList.remove('open'); }
+
+        function submitGoalAction(e) {
+            e.preventDefault();
+            const id = document.getElementById('goalActId').value;
+            const mode = document.getElementById('goalActMode').value;
+            const amt = parseFloat(document.getElementById('goalActAmt').value);
+            const sync = document.getElementById('goalAutoSync').checked;
+            const g = goals.find(x => x.id === id);
+            if (!g || !amt || amt <= 0) return;
+
+            if (mode === 'deposit') g.saved += amt;
+            else g.saved = Math.max(0, g.saved - amt);
+
+            if (sync) {
+                transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    walletId: activeWalletId !== 'all' ? activeWalletId : wallets[0].id,
+                    type: mode === 'deposit' ? 'expense' : 'income',
+                    paymentMethod: 'cash',
+                    bankName: '',
+                    amount: amt,
+                    currency: g.currency,
+                    category: mode === 'deposit' ? 'other_exp' : 'other_inc',
+                    date: getToday(),
+                    note: `${mode === 'deposit' ? 'ដាក់ប្រាក់សន្សំ' : 'ដកប្រាក់សន្សំ'}៖ ${g.name}`
+                });
+            }
+            saveData();
+            closeGoalActionModal();
+            renderAll();
+            notify(mode === 'deposit' ? 'បានដាក់ប្រាក់សន្សំជោគជ័យ!' : 'បានដកប្រាក់សន្សំជោគជ័យ!');
+        }
+
+        // ==========================================
+        // 9. MONTHLY & 12-MONTH YEARLY REPORTS
+        // ==========================================
+        function renderReports() {
+            const ySel = document.getElementById('reportYearSel');
+            const years = new Set([new Date().getFullYear()]);
+            transactions.forEach(t => { if (t.date) years.add(parseInt(t.date.slice(0, 4), 10)); });
+
+            const selVal = ySel.value || String(new Date().getFullYear());
+            ySel.innerHTML = Array.from(years).sort((a, b) => b - a).map(y => `<option value="${y}" ${String(y) === selVal ? 'selected' : ''}>ឆ្នាំ ${y}</option>`).join('');
+            const year = ySel.value;
+
+            const mNames = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+            const stats = Array.from({ length: 12 }, (_, i) => ({
+                num: String(i + 1).padStart(2, '0'),
+                name: mNames[i],
+                inc: 0, exp: 0, incCash: 0, incBank: 0, expCash: 0, expBank: 0, count: 0
+            }));
+
+            transactions.forEach(tx => {
+                if (activeWalletId !== 'all' && tx.walletId !== activeWalletId) return;
+                if (!tx.date || !tx.date.startsWith(year)) return;
+                const idx = parseInt(tx.date.slice(5, 7), 10) - 1;
+                if (idx >= 0 && idx < 12) {
+                    const v = convertAmt(tx.amount, tx.currency, config.currency);
+                    const isB = tx.paymentMethod === 'bank';
+                    if (tx.type === 'income') {
+                        stats[idx].inc += v;
+                        if (isB) stats[idx].incBank += v; else stats[idx].incCash += v;
+                    } else {
+                        stats[idx].exp += v;
+                        if (isB) stats[idx].expBank += v; else stats[idx].expCash += v;
+                    }
+                    stats[idx].count++;
+                }
+            });
+
+            const maxV = Math.max(1, ...stats.map(s => Math.max(s.inc, s.exp)));
+            document.getElementById('yearlyChartGrid').innerHTML = stats.map(s => `
+                <div class="bar-col" onclick="goToMonth('${year}-${s.num}')">
+                    <div class="bar-bars">
+                        <div class="bar-stick inc" style="height: ${Math.round((s.inc / maxV) * 145)}px;" title="ចំណូល: ${fmtMoney(s.inc, config.currency)}"></div>
+                        <div class="bar-stick exp" style="height: ${Math.round((s.exp / maxV) * 145)}px;" title="ចំណាយ: ${fmtMoney(s.exp, config.currency)}"></div>
+                    </div>
+                    <span class="bar-lbl">${s.name}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('monthlyReportList').innerHTML = stats.slice().reverse().map(s => {
+                const net = s.inc - s.exp;
+                return `
+                    <div style="border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: #ffffff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;" onclick="goToMonth('${year}-${s.num}')">
+                        <div>
+                            <div style="font-weight: 800; font-size: 14.5px;">📅 ខែ${s.name} ${year} <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">(${s.count} ប្រតិបត្តិការ)</span></div>
+                            <div style="font-size: 12.5px; margin-top: 4px;">
+                                <span style="color: var(--income); font-weight: 700;">ចំណូល៖ ${fmtMoney(s.inc, config.currency)}</span> (💵 ${fmtMoney(s.incCash, config.currency)} | 🏦 ${fmtMoney(s.incBank, config.currency)})
+                            </div>
+                            <div style="font-size: 12.5px; margin-top: 2px;">
+                                <span style="color: var(--expense); font-weight: 700;">ចំណាយ៖ ${fmtMoney(s.exp, config.currency)}</span> (💵 ${fmtMoney(s.expCash, config.currency)} | 🏦 ${fmtMoney(s.expBank, config.currency)})
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: var(--text-muted);">សមតុល្យសល់</div>
+                            <div style="font-size: 15px; font-weight: 800; color: ${net >= 0 ? 'var(--primary)' : 'var(--expense)'};">${fmtMoney(net, config.currency)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function goToMonth(ym) {
+            selectedMonth = ym;
+            document.getElementById('tfMonthInput').value = ym;
+            setTimeframeMode('month');
+            switchView('transactions');
+        }
+
+        // ==========================================
+        // 10. SETTINGS, EXCEL/WORD IMPORT & BACKUP
+        // ==========================================
+        function renderSettings() {
+            document.getElementById('setCurrency').value = config.currency;
+            document.getElementById('setRate').value = config.rate;
+
+            document.getElementById('settingsWalletList').innerHTML = wallets.map(w => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px;">
+                    <span style="font-weight: 700;">${w.emoji} ${esc(w.name)}</span>
+                    ${wallets.length > 1 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeWallet('${w.id}')">លុប</button>` : '<span style="font-size:11px;color:var(--text-muted);">កាបូបគោល</span>'}
+                </div>
+            `).join('');
+
+            const hasPin = Boolean(config.pin && config.pin.length === 4);
+            document.getElementById('pinDescText').textContent = hasPin ? 'បច្ចុប្បន្ន៖ បានបើកការចាក់សោ PIN រួចរាល់ ✅' : 'បច្ចុប្បន្ន៖ បានបិទលេខកូដសម្ងាត់';
+            document.getElementById('btnRemovePin').style.display = hasPin ? 'inline-flex' : 'none';
+            document.getElementById('dLockBtn').style.display = hasPin ? 'inline-flex' : 'none';
+            document.getElementById('mLockBtn').style.display = hasPin ? 'inline-flex' : 'none';
+        }
+
+        function saveSettingsFromUI() {
+            config.currency = document.getElementById('setCurrency').value;
+            config.rate = parseFloat(document.getElementById('setRate').value) || 4000;
+            saveData();
+            updateCurrencyButtons();
+            renderAll();
+            notify('បានរក្សាទុកការកំណត់!');
+        }
+
+        function createWallet() {
+            const emoji = document.getElementById('addWalletEmoji').value;
+            const name = document.getElementById('addWalletName').value.trim();
+            if (!name) return;
+            wallets.push({ id: 'w_' + Date.now(), name, emoji });
+            document.getElementById('addWalletName').value = '';
+            saveData();
+            renderWalletPills();
+            renderSettings();
+            notify('បានបង្កើតកាបូបលុយថ្មី!');
+        }
+
+        function removeWallet(id) {
+            if (wallets.length <= 1) return;
+            wallets = wallets.filter(w => w.id !== id);
+            if (activeWalletId === id) activeWalletId = 'all';
+            saveData();
+            renderWalletPills();
+            renderSettings();
+            renderAll();
+            notify('បានលុបកាបូបលុយ');
+        }
+
+        // Export Excel CSV with UTF-8 BOM
+        function exportCSV(onlySelectedPeriod) {
+            let list = transactions.filter(tx => activeWalletId === 'all' || tx.walletId === activeWalletId);
+            if (onlySelectedPeriod) {
+                list = list.filter(tx => matchesTimeframe(tx.date));
+            }
+            if (list.length === 0) {
+                notify('មិនមានទិន្នន័យសម្រាប់ទាញយកទេ!');
+                return;
+            }
+
+            const headers = ['កាលបរិច្ឆេទ', 'កាបូបលុយ', 'ប្រភេទ', 'វិធីសាស្ត្រទូទាត់', 'ឈ្មោះធនាគារ', 'មុខទំនិញ', 'ចំនួនទឹកប្រាក់ដើម', 'រូបិយប័ណ្ណ', 'គិតជារៀល (៛)', 'គិតជាដុល្លារ ($)', 'កំណត់ចំណាំ'];
+            const rows = list.map(tx => [
+                tx.date,
+                `"${getWallet(tx.walletId).name.replace(/"/g, '""')}"`,
+                tx.type === 'income' ? 'ចំណូល' : 'ចំណាយ',
+                tx.paymentMethod === 'bank' ? 'កុងធនាគារ' : 'សាច់ប្រាក់សុទ្ធ',
+                `"${(tx.bankName || '').replace(/"/g, '""')}"`,
+                getCat(tx.type, tx.category).name,
+                tx.amount,
+                tx.currency,
+                Math.round(convertAmt(tx.amount, tx.currency, 'KHR')),
+                convertAmt(tx.amount, tx.currency, 'USD').toFixed(2),
+                `"${(tx.note || '').replace(/"/g, '""')}"`
+            ].join(','));
+
+            const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+            const suffix = onlySelectedPeriod
+                ? (timeframeMode === 'day' ? selectedDate : timeframeMode === 'week' ? `Week_${selectedDate}` : timeframeMode === 'month' ? selectedMonth : 'All')
+                : 'All';
+            triggerDownload(csv, `Khmer_Expense_${suffix}.csv`, 'text/csv;charset=utf-8;');
+            notify('បានទាញយកឯកសារ Excel (CSV) ជោគជ័យ!');
+        }
+
+        function downloadExcelTemplate() {
+            const tpl = '\uFEFFកាលបរិច្ឆេទ,ប្រភេទ (ចំណូល/ចំណាយ),ការទូទាត់ (សាច់ប្រាក់/ABA/ACLEDA),មុខទំនិញ,ចំនួនទឹកប្រាក់,រូបិយប័ណ្ណ (KHR/USD),កំណត់ចំណាំ\n' +
+                        `${getToday()},ចំណាយ,សាច់ប្រាក់,អាហារ,15000,KHR,បាយថ្ងៃត្រង់\n` +
+                        `${getToday()},ចំណូល,ABA Bank,ប្រាក់ខែ,600,USD,ប្រាក់ខែប្រចាំខែ`;
+            triggerDownload(tpl, 'Expense_Import_Template.csv', 'text/csv;charset=utf-8;');
+            notify('បានទាញយកគំរូ Excel!');
+        }
+
+        function handleCsvUpload(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById('smartPasteBox').value = ev.target.result;
+                parseAndImportText();
+            };
+            reader.readAsText(f);
+            e.target.value = '';
+        }
+
+        function parseAndImportText() {
+            const raw = document.getElementById('smartPasteBox').value.trim();
+            if (!raw) {
+                notify('សូម Paste តារាង ឬជ្រើសរើសឯកសារជាមុនសិន!');
+                return;
+            }
+
+            const lines = raw.split(/\r?\n/).filter(l => l.trim());
+            let count = 0;
+
+            lines.forEach((line, idx) => {
+                const cols = line.includes('\t') ? line.split('\t') : line.split(',');
+                if (cols.length < 2) return;
+                if (idx === 0 && (cols[0].includes('កាលបរិច្ឆេទ') || cols[0].toLowerCase().includes('date'))) return;
+
+                let amount = 0, currency = config.currency, date = getToday(), type = 'expense', paymentMethod = 'cash', bankName = '', notes = [];
+
+                cols.forEach(cell => {
+                    const c = cell.replace(/^"|"$/g, '').trim();
+                    if (!c) return;
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(c)) date = c;
+                    else if (c === 'ចំណូល' || c.toLowerCase() === 'income') type = 'income';
+                    else if (c === 'ចំណាយ' || c.toLowerCase() === 'expense') type = 'expense';
+                    else if (c.toUpperCase() === 'USD' || c.includes('$')) {
+                        currency = 'USD';
+                        const n = parseFloat(c.replace(/[^0-9.]/g, ''));
+                        if (n > 0) amount = n;
+                    } else if (c.toUpperCase() === 'KHR' || c.includes('៛')) {
+                        currency = 'KHR';
+                        const n = parseFloat(c.replace(/[^0-9.]/g, ''));
+                        if (n > 0) amount = n;
+                    } else if (/aba|acleda|អេស៊ីលីដា|wing|canadia|sathapana|amk|ធនាគារ|bank/i.test(c)) {
+                        paymentMethod = 'bank';
+                        bankName = c;
+                    } else if (!isNaN(parseFloat(c.replace(/,/g, ''))) && isFinite(c.replace(/,/g, ''))) {
+                        const n = parseFloat(c.replace(/,/g, ''));
+                        if (n > 0 && amount === 0) amount = n;
+                    } else {
+                        notes.push(c);
+                    }
+                });
+
+                if (amount > 0) {
+                    transactions.unshift({
+                        id: 'imp_' + Date.now() + '_' + idx,
+                        walletId: activeWalletId !== 'all' ? activeWalletId : wallets[0].id,
+                        type, paymentMethod, bankName, amount, currency,
+                        category: type === 'income' ? 'other_inc' : 'other_exp',
+                        date,
+                        note: notes.join(' - ')
+                    });
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                document.getElementById('smartPasteBox').value = '';
+                saveData();
+                renderAll();
+                notify(`បាននាំចូលទិន្នន័យចំនួន ${count} ជួរដោយស្វ័យប្រវត្តិ!`);
+            } else {
+                notify('មិនអាចស្គាល់ទម្រង់ទិន្នន័យបានទេ សូមពិនិត្យតួលេខទឹកប្រាក់!');
+            }
+        }
+
+        // JSON Backup & Smart Merge Restore
+        function exportBackupJSON() {
+            const data = { version: 4, exportedAt: new Date().toISOString(), config, wallets, transactions, goals };
+            triggerDownload(JSON.stringify(data, null, 2), `Khmer_Expense_Backup_${getToday()}.json`, 'application/json');
+            notify('បានទាញយកឯកសារ Backup JSON ជោគជ័យ!');
+        }
+
+        function handleBackupUpload(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    if (!parsed.transactions || !Array.isArray(parsed.transactions)) {
+                        notify('ឯកសារ JSON មិនត្រឹមត្រូវទេ!');
+                        return;
+                    }
+                    pendingBackupData = parsed;
+                    document.getElementById('mergeSummaryText').textContent = `រកឃើញប្រតិបត្តិការចំនួន ${parsed.transactions.length} និងគោលដៅសន្សំ ${(parsed.goals || []).length} នៅក្នុងឯកសារ Backup។`;
+                    document.getElementById('mergeJsonModal').classList.add('open');
+                } catch (err) {
+                    notify('មិនអាចអានឯកសារ JSON បានទេ!');
+                }
+            };
+            reader.readAsText(f);
+            e.target.value = '';
+        }
+
+        function closeMergeModal() {
+            document.getElementById('mergeJsonModal').classList.remove('open');
+            pendingBackupData = null;
+        }
+
+        function executeJsonRestore(mode) {
+            if (!pendingBackupData) return;
+            const d = pendingBackupData;
+
+            if (mode === 'overwrite') {
+                if (d.wallets && d.wallets.length) wallets = d.wallets;
+                transactions = d.transactions;
+                goals = d.goals || [];
+                notify('បានជំនួសទិន្នន័យទាំងស្រុងជោគជ័យ!');
+            } else {
+                const wSet = new Set(wallets.map(w => w.id));
+                (d.wallets || []).forEach(w => { if (!wSet.has(w.id)) wallets.push(w); });
+
+                const tSet = new Set(transactions.map(t => t.id));
+                let added = 0;
+                d.transactions.forEach(t => {
+                    if (!tSet.has(t.id)) {
+                        transactions.push({
+                            ...t,
+                            walletId: t.walletId || wallets[0].id,
+                            paymentMethod: t.paymentMethod || 'cash',
+                            bankName: t.bankName || ''
+                        });
+                        added++;
+                    }
+                });
+
+                const gSet = new Set(goals.map(g => g.id));
+                (d.goals || []).forEach(g => { if (!gSet.has(g.id)) goals.push(g); });
+                notify(`បានបូកបញ្ចូលទិន្នន័យថ្មីចំនួន ${added} បន្ថែម!`);
+            }
+
+            saveData();
+            closeMergeModal();
+            renderWalletPills();
+            renderSettings();
+            renderAll();
+        }
+
+        function triggerDownload(content, filename, mime) {
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ==========================================
+        // 11. PIN LOCK & KEYBOARD SHORTCUTS
+        // ==========================================
+        function enablePinLock() {
+            const v = document.getElementById('pinSetupInput').value.trim();
+            if (!/^\d{4}$/.test(v)) {
+                notify('សូមបញ្ចូលលេខ ៤ ខ្ទង់ឱ្យបានត្រឹមត្រូវ!');
+                return;
+            }
+            config.pin = v;
+            document.getElementById('pinSetupInput').value = '';
+            saveData();
+            renderSettings();
+            notify('បានកំណត់លេខកូដសម្ងាត់ PIN ជោគជ័យ!');
+        }
+
+        function disablePinLock() {
+            config.pin = '';
+            saveData();
+            renderSettings();
+            notify('បានបិទលេខកូដសម្ងាត់ PIN');
+        }
+
+        function lockAppNow() {
+            if (!config.pin) return;
+            pinBuffer = '';
+            refreshPinDots();
+            document.getElementById('pinErrText').textContent = '';
+            document.getElementById('pinScreen').classList.add('open');
+        }
+
+        function pressPin(digit) {
+            if (pinBuffer.length >= 4) return;
+            pinBuffer += digit;
+            refreshPinDots();
+            if (pinBuffer.length === 4) {
+                if (pinBuffer === config.pin) {
+                    document.getElementById('pinScreen').classList.remove('open');
+                    pinBuffer = '';
+                    refreshPinDots();
+                } else {
+                    document.getElementById('pinErrText').textContent = 'លេខកូដ PIN មិនត្រឹមត្រូវ សូមសាកល្បងម្តងទៀត!';
+                    setTimeout(() => { pinBuffer = ''; refreshPinDots(); }, 350);
+                }
+            }
+        }
+
+        function backspacePin() {
+            pinBuffer = pinBuffer.slice(0, -1);
+            refreshPinDots();
+        }
+
+        function clearPin() {
+            pinBuffer = '';
+            refreshPinDots();
+        }
+
+        function refreshPinDots() {
+            for (let i = 0; i < 4; i++) {
+                const d = document.getElementById('pdot' + i);
+                if (d) d.classList.toggle('filled', i < pinBuffer.length);
+            }
+        }
+
+        // Desktop Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // PIN Screen numeric input
+            if (document.getElementById('pinScreen').classList.contains('open')) {
+                if (/^[0-9]$/.test(e.key)) pressPin(e.key);
+                else if (e.key === 'Backspace') backspacePin();
+                return;
+            }
+
+            if (e.key === 'Escape') {
+                closeTxModal();
+                closeBulkModal();
+                closeGoalModal();
+                closeGoalActionModal();
+                closeMergeModal();
+                return;
+            }
+
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+            if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                openTxModal();
+            } else if (e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                openBulkModal();
+            } else if (e.key === '/') {
+                e.preventDefault();
+                switchView('transactions');
+                setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
+            }
+        });
+
+        // ==========================================
+        // 12. TOAST & OFFLINE PWA SETUP
+        // ==========================================
+        let toastTimeout = null;
+        function notify(msg, allowUndo = false) {
+            const bar = document.getElementById('toastBar');
+            document.getElementById('toastText').textContent = msg;
+            document.getElementById('toastUndo').style.display = allowUndo ? 'inline-block' : 'none';
+            bar.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(hideToast, allowUndo ? 4500 : 2800);
+        }
+
+        function hideToast() {
+            document.getElementById('toastBar').classList.remove('show');
+        }
+
+        function initOfflinePWA() {
+            try {
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0f766e"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="260">📒</text></svg>`;
+                const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                const manifest = {
+                    name: 'កត់ត្រាចំណូល-ចំណាយប្រចាំថ្ងៃ',
+                    short_name: 'ចំណូលចំណាយ',
+                    start_url: './',
+                    display: 'standalone',
+                    background_color: '#f1f5f9',
+                    theme_color: '#0f766e',
+                    icons: [{ src: iconUrl, sizes: '512x512', type: 'image/svg+xml' }]
+                };
+                const mLink = document.createElement('link');
+                mLink.rel = 'manifest';
+                mLink.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+                document.head.appendChild(mLink);
+
+                if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+                    const sw = `
+                        const C = 'kh-universal-offline-v4';
+                        self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(['./']))); });
+                        self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+                        self.addEventListener('fetch', e => {
+                            e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(nr => {
+                                const cp = nr.clone(); caches.open(C).then(c => c.put(e.request, cp)); return nr;
+                            }).catch(() => caches.match('./'))));
+                        });
+                    `;
+                    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], { type: 'application/javascript' }))).catch(() => {});
+                }
+            } catch (err) {}
+
+            window.addEventListener('beforeinstallprompt', e => {
+                e.preventDefault();
+                pwaPromptEvent = e;
+                const btn = document.getElementById('installPwaBtn');
+                if (btn) btn.style.display = 'inline-flex';
+            });
+        }
+
+        function installPWA() {
+            if (!pwaPromptEvent) return;
+            pwaPromptEvent.prompt();
+            pwaPromptEvent.userChoice.then(() => {
+                pwaPromptEvent = null;
+                document.getElementById('installPwaBtn').style.display = 'none';
+            });
+        }
+
+        // ==========================================
+        // 13. STARTUP
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            selectedDate = getToday();
+            selectedMonth = selectedDate.slice(0, 7);
+            document.getElementById('tfDateInput').value = selectedDate;
+            document.getElementById('tfMonthInput').value = selectedMonth;
+            updateCurrencyButtons();
+            renderWalletPills();
+            renderSettings();
+            setTimeframeMode('month');
+            initOfflinePWA();
+
+            if (config.pin && config.pin.length === 4) {
+                lockAppNow();
+            }
+        });
+    </script>
+</body>
+</html>
