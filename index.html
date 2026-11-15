@@ -40,6 +40,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            overscroll-behavior-y: none;
+        }
+
+        html.modal-open, body.modal-open {
+            overflow: hidden !important;
+            overscroll-behavior: none !important;
+            touch-action: none;
+        }
+
         body {
             font-family: 'Khmer OS Battambang', 'Noto Sans Khmer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
@@ -742,12 +752,17 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
+            height: 100vh;
+            height: 100dvh;
+            max-height: 100dvh;
             background: rgba(15, 23, 42, 0.55);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 200;
             padding: 16px;
+            overscroll-behavior: none;
+            touch-action: none;
         }
         .modal-overlay.open { display: flex; }
 
@@ -755,21 +770,35 @@
             background: #ffffff;
             width: 100%;
             max-width: 560px;
-            max-height: 92vh;
-            overflow-y: auto;
+            max-height: 92dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             border-radius: 20px;
-            padding: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            touch-action: pan-y;
         }
         .modal-dialog.xl { max-width: 960px; }
 
         .modal-head {
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 12px;
-            margin-bottom: 14px;
+            padding: 16px 20px 12px;
             border-bottom: 1px solid var(--border);
+            background: #ffffff;
+            touch-action: none;
+        }
+
+        .modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            padding: 14px 20px calc(22px + env(safe-area-inset-bottom));
         }
 
         .modal-title { font-size: 16px; font-weight: 800; }
@@ -937,10 +966,32 @@
             .modal-overlay {
                 align-items: flex-end;
                 padding: 0;
+                height: 100dvh;
+                max-height: 100dvh;
             }
             .modal-dialog {
-                border-radius: 22px 22px 0 0;
-                padding: 18px;
+                width: 100%;
+                max-width: 100%;
+                height: 92dvh;
+                max-height: 92dvh;
+                border-radius: 24px 24px 0 0;
+                transform: translate3d(0, 100%, 0);
+                will-change: transform;
+                transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .modal-overlay.open .modal-dialog {
+                transform: translate3d(0, 0, 0);
+            }
+            .modal-head {
+                padding: 14px 16px 10px;
+            }
+            .modal-body {
+                padding: 12px 16px calc(24px + env(safe-area-inset-bottom));
+            }
+            .modal-dialog input,
+            .modal-dialog select,
+            .modal-dialog textarea {
+                font-size: 16px !important;
             }
             .toast-bar { bottom: 82px; }
         }
@@ -1451,6 +1502,7 @@
                 <button type="button" class="modal-close" onclick="closeTxModal()">✕</button>
             </div>
 
+            <div class="modal-body">
             <form onsubmit="submitTxForm(event)">
                 <input type="hidden" id="editTxId">
                 <input type="hidden" id="formTxType" value="expense">
@@ -1526,6 +1578,7 @@
                     <button type="submit" class="btn btn-primary" style="flex: 2;">💾 រក្សាទុកទិន្នន័យ</button>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 
@@ -1537,6 +1590,7 @@
                 <button type="button" class="modal-close" onclick="closeBulkModal()">✕</button>
             </div>
 
+            <div class="modal-body">
             <div class="grid-2" style="margin-bottom: 12px;">
                 <div>
                     <label class="form-lbl">កាបូបលុយ</label>
@@ -1548,7 +1602,7 @@
                 </div>
             </div>
 
-            <div id="bulkRowsWrap" style="max-height: 52vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+            <div id="bulkRowsWrap" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <button type="button" class="btn btn-secondary btn-sm" onclick="appendBulkRows(3)">+ បន្ថែម ៣ ជួរទៀត</button>
@@ -1556,6 +1610,7 @@
                     <button type="button" class="btn btn-secondary" onclick="closeBulkModal()">បិទ</button>
                     <button type="button" class="btn btn-primary" onclick="saveAllBulkRows()">💾 រក្សាទុកទាំងអស់</button>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -1567,6 +1622,7 @@
                 <h3 id="goalModalTitle" class="modal-title">🐷 បង្កើតគោលដៅប្រាក់សន្សំ</h3>
                 <button type="button" class="modal-close" onclick="closeGoalModal()">✕</button>
             </div>
+            <div class="modal-body">
             <form onsubmit="submitGoalForm(event)">
                 <input type="hidden" id="editGoalId">
                 <div class="form-grp">
@@ -1592,6 +1648,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">💾 រក្សាទុកគោលដៅ</button>
             </form>
+            </div>
         </div>
     </div>
 
@@ -1602,6 +1659,7 @@
                 <h3 id="goalActTitle" class="modal-title">ដាក់ប្រាក់សន្សំ</h3>
                 <button type="button" class="modal-close" onclick="closeGoalActionModal()">✕</button>
             </div>
+            <div class="modal-body">
             <form onsubmit="submitGoalAction(event)">
                 <input type="hidden" id="goalActId">
                 <input type="hidden" id="goalActMode" value="deposit">
@@ -1617,6 +1675,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">បញ្ជាក់</button>
             </form>
+            </div>
         </div>
     </div>
 
@@ -1627,11 +1686,13 @@
                 <h3 class="modal-title">⬆️ ជ្រើសរើសរបៀបបញ្ចូលទិន្នន័យ Backup</h3>
                 <button type="button" class="modal-close" onclick="closeMergeModal()">✕</button>
             </div>
+            <div class="modal-body">
             <p id="mergeSummaryText" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;"></p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button type="button" class="btn btn-primary" onclick="executeJsonRestore('merge')">➕ បូកបញ្ចូលគ្នា (Merge - រក្សាទិន្នន័យចាស់ & បន្ថែមថ្មី)</button>
                 <button type="button" class="btn btn-danger" onclick="executeJsonRestore('overwrite')">🔄 ជំនួសទាំងស្រុង (Overwrite - លុបចាស់ដាក់ថ្មី)</button>
                 <button type="button" class="btn btn-secondary" onclick="closeMergeModal()">បោះបង់</button>
+            </div>
             </div>
         </div>
     </div>
@@ -1686,13 +1747,38 @@
         let pendingBackupData = null;
         let pinBuffer = '';
         let pwaPromptEvent = null;
+        let lastKnownTodayStr = '';
+
+        function syncModalLockState() {
+            const anyOpen = document.querySelectorAll('.modal-overlay.open').length > 0;
+            document.documentElement.classList.toggle('modal-open', anyOpen);
+            document.body.classList.toggle('modal-open', anyOpen);
+            if (!anyOpen) {
+                document.querySelectorAll('.modal-dialog').forEach(d => {
+                    d.style.maxHeight = '';
+                    d.style.height = '';
+                });
+            }
+        }
+
+        function setModalOpen(modalId, isOpen) {
+            const el = document.getElementById(modalId);
+            if (!el) return;
+            if (isOpen) {
+                el.classList.add('open');
+                const body = el.querySelector('.modal-body');
+                if (body) body.scrollTop = 0;
+            } else {
+                el.classList.remove('open');
+            }
+            syncModalLockState();
+        }
 
         // ==========================================
-        // 2. LOAD & SAVE OFFLINE DATA
+        // 2. LOAD & SAVE DATA (LOCALSTORAGE)
         // ==========================================
         function loadData() {
             try {
-                // Migrate legacy v4 keys if v3 is empty
                 const c = localStorage.getItem(KEYS.CFG) || localStorage.getItem('kh_universal_cfg_v4');
                 if (c) config = { ...config, ...JSON.parse(c) };
 
@@ -2221,11 +2307,11 @@
 
             renderQuickAmountChips();
             renderDailyNoteChips();
-            document.getElementById('txModal').classList.add('open');
+            setModalOpen('txModal', true);
         }
 
         function closeTxModal() {
-            document.getElementById('txModal').classList.remove('open');
+            setModalOpen('txModal', false);
         }
 
         function setFormType(type, selectedCat = null) {
@@ -2393,11 +2479,11 @@
 
             document.getElementById('bulkRowsWrap').innerHTML = '';
             appendBulkRows(5);
-            document.getElementById('bulkModal').classList.add('open');
+            setModalOpen('bulkModal', true);
         }
 
         function closeBulkModal() {
-            document.getElementById('bulkModal').classList.remove('open');
+            setModalOpen('bulkModal', false);
         }
 
         function catOptionsHTML(type) {
@@ -2533,10 +2619,10 @@
                 document.getElementById('goalCurrInp').value = config.currency;
                 document.getElementById('goalSavedInp').value = 0;
             }
-            document.getElementById('goalModal').classList.add('open');
+            setModalOpen('goalModal', true);
         }
 
-        function closeGoalModal() { document.getElementById('goalModal').classList.remove('open'); }
+        function closeGoalModal() { setModalOpen('goalModal', false); }
 
         function submitGoalForm(e) {
             e.preventDefault();
@@ -2576,10 +2662,10 @@
             document.getElementById('goalActTitle').textContent = mode === 'deposit' ? `➕ ដាក់សន្សំ៖ ${g.name}` : `➖ ដកប្រាក់ពី៖ ${g.name}`;
             document.getElementById('goalActCurr').textContent = g.currency === 'KHR' ? '៛' : '$';
             document.getElementById('goalActAmt').value = '';
-            document.getElementById('goalActionModal').classList.add('open');
+            setModalOpen('goalActionModal', true);
         }
 
-        function closeGoalActionModal() { document.getElementById('goalActionModal').classList.remove('open'); }
+        function closeGoalActionModal() { setModalOpen('goalActionModal', false); }
 
         function submitGoalAction(e) {
             e.preventDefault();
@@ -2882,7 +2968,7 @@
                     }
                     pendingBackupData = parsed;
                     document.getElementById('mergeSummaryText').textContent = `រកឃើញប្រតិបត្តិការចំនួន ${parsed.transactions.length} និងគោលដៅសន្សំ ${(parsed.goals || []).length} នៅក្នុងឯកសារ Backup។`;
-                    document.getElementById('mergeJsonModal').classList.add('open');
+                    setModalOpen('mergeJsonModal', true);
                 } catch (err) {
                     notify('មិនអាចអានឯកសារ JSON បានទេ!');
                 }
@@ -2892,7 +2978,7 @@
         }
 
         function closeMergeModal() {
-            document.getElementById('mergeJsonModal').classList.remove('open');
+            setModalOpen('mergeJsonModal', false);
             pendingBackupData = null;
         }
 
@@ -3115,9 +3201,73 @@
         // ==========================================
         // 13. STARTUP
         // ==========================================
+        // 13. MOBILE VIEWPORT STABILITY & STARTUP
+        // ==========================================
+        function setupMobileViewportStability() {
+            const adjustForKeyboard = () => {
+                const openDialog = document.querySelector('.modal-overlay.open .modal-dialog');
+                if (!openDialog) return;
+                if (window.innerWidth <= 860 && window.visualViewport) {
+                    const vvHeight = window.visualViewport.height;
+                    openDialog.style.height = Math.round(vvHeight * 0.94) + 'px';
+                    openDialog.style.maxHeight = Math.round(vvHeight * 0.94) + 'px';
+                }
+                if (document.body.classList.contains('modal-open') && window.scrollY !== 0) {
+                    window.scrollTo(0, 0);
+                }
+            };
+
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustForKeyboard);
+                window.visualViewport.addEventListener('scroll', () => {
+                    if (document.body.classList.contains('modal-open')) {
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
+
+            document.addEventListener('focusin', (e) => {
+                const body = e.target.closest('.modal-body');
+                if (body && window.innerWidth <= 860) {
+                    setTimeout(() => {
+                        adjustForKeyboard();
+                        e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }, 120);
+                }
+            });
+
+            document.addEventListener('focusout', () => {
+                if (window.innerWidth <= 860) {
+                    setTimeout(() => {
+                        window.scrollTo(0, 0);
+                        adjustForKeyboard();
+                    }, 80);
+                }
+            });
+        }
+
+        function checkRealTimeDateRollover() {
+            const nowToday = getToday();
+            if (lastKnownTodayStr && nowToday !== lastKnownTodayStr) {
+                const wasViewingOldToday = (selectedDate === lastKnownTodayStr);
+                const wasViewingOldMonth = (selectedMonth === lastKnownTodayStr.slice(0, 7));
+                lastKnownTodayStr = nowToday;
+                if (wasViewingOldToday) {
+                    selectedDate = nowToday;
+                    document.getElementById('tfDateInput').value = nowToday;
+                }
+                if (wasViewingOldMonth) {
+                    selectedMonth = nowToday.slice(0, 7);
+                    document.getElementById('tfMonthInput').value = selectedMonth;
+                }
+                renderAll();
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
-            selectedDate = getToday();
+            lastKnownTodayStr = getToday();
+            selectedDate = lastKnownTodayStr;
             selectedMonth = selectedDate.slice(0, 7);
             document.getElementById('tfDateInput').value = selectedDate;
             document.getElementById('tfMonthInput').value = selectedMonth;
@@ -3125,7 +3275,13 @@
             renderWalletPills();
             renderSettings();
             setTimeframeMode('month');
+            setupMobileViewportStability();
             initOfflinePWA();
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') checkRealTimeDateRollover();
+            });
+            window.addEventListener('focus', checkRealTimeDateRollover);
 
             if (config.pin && config.pin.length === 4) {
                 lockAppNow();
