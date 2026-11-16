@@ -1464,9 +1464,9 @@
                     <div class="card-header">
                         <h3 class="card-title">💾 បម្រុងទុក និងផ្ទេរទិន្នន័យ (Backup & Restore JSON)</h3>
                     </div>
-                    <div class="grid-2">
-                        <button type="button" class="btn btn-secondary" onclick="exportBackupJSON()">📤 ទាញយក Backup (JSON)</button>
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('jsonFileInp').click()">📥 បញ្ចូល Backup (JSON)</button>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px;">
+                        <button type="button" class="btn btn-secondary" style="width: 100%; min-width: 0; white-space: normal; text-align: center; padding: 10px 8px; font-size: 12.5px;" onclick="exportBackupJSON()">📤 ទាញយក Backup (JSON)</button>
+                        <button type="button" class="btn btn-secondary" style="width: 100%; min-width: 0; white-space: normal; text-align: center; padding: 10px 8px; font-size: 12.5px;" onclick="document.getElementById('jsonFileInp').click()">📥 បញ្ចូល Backup (JSON)</button>
                         <input type="file" id="jsonFileInp" accept=".json" style="display: none;" onchange="handleBackupUpload(event)">
                     </div>
                     <button type="button" id="installPwaBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px; display: none;" onclick="installPWA()">📲 ដំឡើងកម្មវិធីលើអេក្រង់ (Install App)</button>
