@@ -241,6 +241,24 @@
             transition: all 0.15s;
         }
 
+        .w-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .mobile-header .w-pill {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .mobile-header .w-pill.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            border-color: #ffffff;
+        }
+
         /* Timeframe Segmented Bar & Quick Day/Week/Month Strip */
         .tf-bar {
             background: var(--card);
@@ -330,24 +348,6 @@
             gap: 8px;
             font-size: 12.5px;
             font-weight: 700;
-        }
-
-        .w-pill.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
-
-        .mobile-header .w-pill {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
-        .mobile-header .w-pill.active {
-            background: #ffffff;
-            color: var(--primary-dark);
-            border-color: #ffffff;
         }
 
         .topbar-actions {
@@ -776,6 +776,7 @@
             box-shadow: 0 3px 10px rgba(15, 118, 110, 0.3);
         }
 
+        /* Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -895,6 +896,32 @@
             color: #0369a1;
         }
 
+        /* Bulk Entry Responsive Grid */
+        .bulk-grid {
+            display: grid;
+            grid-template-columns: 112px 145px 140px minmax(170px, 1.3fr) minmax(180px, 1.5fr);
+            gap: 8px;
+            align-items: center;
+        }
+        .bulk-amt-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            min-width: 0;
+        }
+        .bulk-amt-group .bk-amt {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 100%;
+        }
+        .bulk-amt-group .bk-curr {
+            flex: 0 0 64px;
+            width: 64px;
+            padding-left: 6px !important;
+            padding-right: 4px !important;
+            text-align: center;
+        }
+
         /* Toast */
         .toast-bar {
             position: fixed;
@@ -974,7 +1001,7 @@
             .mobile-bottom-nav { display: flex; }
             .main-content {
                 margin-left: 0;
-                padding: 12px 12px 86px;
+                padding: 12px 12px 92px;
             }
             .kpi-grid {
                 grid-template-columns: 1fr 1fr;
@@ -999,48 +1026,61 @@
             .modal-dialog {
                 width: 100%;
                 max-width: 100%;
-                height: 92dvh;
-                max-height: 92dvh;
-                border-radius: 24px 24px 0 0;
+                height: 94dvh;
+                max-height: 94dvh;
+                border-radius: 22px 22px 0 0;
                 transform: translate3d(0, 100%, 0);
                 will-change: transform;
-                transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+                transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
             }
             .modal-overlay.open .modal-dialog {
                 transform: translate3d(0, 0, 0);
             }
             .modal-head {
-                padding: 14px 16px 10px;
+                padding: 12px 16px 10px;
             }
             .modal-body {
-                padding: 12px 16px calc(24px + env(safe-area-inset-bottom));
+                padding: 12px 16px calc(150px + env(safe-area-inset-bottom));
             }
             .modal-dialog input,
             .modal-dialog select,
             .modal-dialog textarea {
                 font-size: 16px !important;
             }
-            .toast-bar { bottom: 82px; }
-        }
-
-        @media (max-width: 440px) {
-            .kpi-grid { grid-template-columns: 1fr; }
+            .bulk-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .bulk-grid .bk-type,
+            .bulk-grid .bk-cat,
+            .bulk-grid .bk-pay {
+                padding: 8px 6px !important;
+                font-size: 13.5px !important;
+            }
+            .bulk-amt-group {
+                grid-column: 1 / -1;
+            }
+            .bulk-grid .bk-note {
+                grid-column: 1 / -1;
+                width: 100%;
+            }
+            .toast-bar { bottom: 86px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PIN Lock Screen -->
+    <!-- PIN LOCK SCREEN -->
     <div id="pinScreen" class="pin-screen">
-        <div style="font-size: 44px; margin-bottom: 8px;">🔒</div>
-        <h2 style="font-size: 18px; font-weight: 800;">សូមបញ្ចូលលេខកូដសម្ងាត់ (PIN)</h2>
-        <p id="pinErrText" style="font-size: 12.5px; color: #fda4af; min-height: 20px; margin-top: 4px;"></p>
+        <div style="font-size: 46px;">🔒</div>
+        <h2 style="font-size: 19px; font-weight: 800; margin-top: 8px;">បញ្ចូលលេខកូដសម្ងាត់ (PIN)</h2>
         <div class="pin-dots">
             <div class="pin-dot" id="pdot0"></div>
             <div class="pin-dot" id="pdot1"></div>
             <div class="pin-dot" id="pdot2"></div>
             <div class="pin-dot" id="pdot3"></div>
         </div>
+        <div id="pinErrText" style="color: #fda4af; font-size: 12.5px; font-weight: 700; min-height: 20px; margin-bottom: 10px;"></div>
         <div class="pin-keypad">
             <button type="button" class="pin-btn" onclick="pressPin('1')">1</button>
             <button type="button" class="pin-btn" onclick="pressPin('2')">2</button>
@@ -1051,32 +1091,32 @@
             <button type="button" class="pin-btn" onclick="pressPin('7')">7</button>
             <button type="button" class="pin-btn" onclick="pressPin('8')">8</button>
             <button type="button" class="pin-btn" onclick="pressPin('9')">9</button>
-            <button type="button" class="pin-btn" style="font-size: 14px;" onclick="clearPin()">លុប</button>
+            <button type="button" class="pin-btn" style="font-size: 14px;" onclick="clearPin()">សម្អាត</button>
             <button type="button" class="pin-btn" onclick="pressPin('0')">0</button>
             <button type="button" class="pin-btn" style="font-size: 18px;" onclick="backspacePin()">⌫</button>
         </div>
     </div>
 
-    <!-- Mobile Sticky Header -->
+    <!-- MOBILE HEADER -->
     <header class="mobile-header">
         <div class="m-header-top">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 22px;">📒</span>
                 <div>
                     <div style="font-size: 15px; font-weight: 800; line-height: 1.2;">ចំណូល-ចំណាយប្រចាំថ្ងៃ</div>
-                    <div style="font-size: 10.5px; opacity: 0.9;">Offline • សាច់ប្រាក់ & ធនាគារ</div>
+                    <div style="font-size: 11px; opacity: 0.85;">Offline • សាច់ប្រាក់ & ធនាគារ</div>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" id="mCurrBtn" class="m-pill-btn" onclick="toggleBaseCurrency()">៛</button>
+            <div style="display: flex; gap: 6px;">
                 <button type="button" id="mLockBtn" class="m-pill-btn" style="display: none;" onclick="lockAppNow()">🔒</button>
+                <button type="button" id="mCurrBtn" class="m-pill-btn" onclick="toggleBaseCurrency()">៛</button>
             </div>
         </div>
         <div id="mobileWalletPills" class="wallet-pills"></div>
     </header>
 
     <div class="layout-wrapper">
-        <!-- Desktop Left Fixed Sidebar -->
+        <!-- DESKTOP SIDEBAR -->
         <aside class="desktop-sidebar">
             <div class="brand-box">
                 <div class="brand-icon">📒</div>
@@ -1087,15 +1127,15 @@
             </div>
 
             <nav class="sidebar-nav">
-                <button type="button" id="snav-dashboard" class="s-nav-btn active" onclick="switchView('dashboard')">🏠 ទំព័រដើម (Dashboard)</button>
+                <button type="button" id="snav-dashboard" class="s-nav-btn active" onclick="switchView('dashboard')">📊 ទំព័រដើម (Dashboard)</button>
                 <button type="button" id="snav-transactions" class="s-nav-btn" onclick="switchView('transactions')">📋 បញ្ជីប្រតិបត្តិការ</button>
-                <button type="button" id="snav-reports" class="s-nav-btn" onclick="switchView('reports')">📊 របាយការណ៍ប្រចាំខែ</button>
+                <button type="button" id="snav-reports" class="s-nav-btn" onclick="switchView('reports')">📈 របាយការណ៍ប្រចាំខែ</button>
                 <button type="button" id="snav-savings" class="s-nav-btn" onclick="switchView('savings')">🐷 គោលដៅប្រាក់សន្សំ</button>
                 <button type="button" id="snav-settings" class="s-nav-btn" onclick="switchView('settings')">⚙️ ការកំណត់ & Backup</button>
             </nav>
 
             <div class="sidebar-footer">
-                <div style="font-weight: 800; margin-bottom: 6px; color: var(--text);">⌨️ ផ្លូវកាត់ក្តារចុច (Shortcuts)</div>
+                <div style="font-weight: 800; color: var(--text); margin-bottom: 6px;">⌨️ ផ្លូវកាត់ក្តារចុច (Shortcuts)</div>
                 <div class="kbd-hint"><span>កត់ត្រាថ្មី</span><kbd>N</kbd></div>
                 <div class="kbd-hint"><span>កត់ត្រាម្តងច្រើន</span><kbd>B</kbd></div>
                 <div class="kbd-hint"><span>ស្វែងរក</span><kbd>/</kbd></div>
@@ -1103,60 +1143,85 @@
             </div>
         </aside>
 
-        <!-- Main Workspace -->
-        <div class="main-content">
-            <!-- Desktop Top Bar -->
+        <!-- MAIN WORKSPACE -->
+        <main class="main-content">
+            <!-- DESKTOP TOPBAR -->
             <div class="desktop-topbar">
                 <div id="desktopWalletPills" class="wallet-pills"></div>
-
                 <div class="topbar-actions">
-                    <button type="button" id="dCurrBtn" class="btn btn-secondary" onclick="toggleBaseCurrency()">💱 ប្រាក់រៀល (៛)</button>
-                    <button type="button" id="dLockBtn" class="btn btn-secondary" style="display: none;" onclick="lockAppNow()">🔒 ចាក់សោ</button>
-                    <button type="button" class="btn btn-secondary" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
-                    <button type="button" class="btn btn-primary" onclick="openTxModal()">➕ កត់ត្រាថ្មី</button>
+                    <button type="button" id="dLockBtn" class="btn btn-secondary btn-sm" style="display: none;" onclick="lockAppNow()">🔒 ចាក់សោ</button>
+                    <button type="button" id="dCurrBtn" class="btn btn-secondary btn-sm" onclick="toggleBaseCurrency()">💱 ប្រាក់រៀល (៛)</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openTxModal()">➕ កត់ត្រាថ្មី</button>
                 </div>
             </div>
 
-            <!-- Timeframe Segmented Bar: Day / Week / Month / All -->
+            <!-- TIMEFRAME SELECTOR BAR (DAY / WEEK / MONTH / ALL) -->
             <div id="timeframeBarSection" class="tf-bar">
                 <div class="tf-pills">
-                    <button type="button" id="tf-day" class="tf-btn" onclick="setTimeframeMode('day')">📅 ថ្ងៃនេះ / តាមថ្ងៃ</button>
-                    <button type="button" id="tf-week" class="tf-btn" onclick="setTimeframeMode('week')">📆 សប្តាហ៍នេះ</button>
-                    <button type="button" id="tf-month" class="tf-btn active" onclick="setTimeframeMode('month')">🗓️ ខែនេះ / តាមខែ</button>
+                    <button type="button" id="tf-day" class="tf-btn" onclick="setTimeframeMode('day', true)">📅 ថ្ងៃនេះ / តាមថ្ងៃ</button>
+                    <button type="button" id="tf-week" class="tf-btn" onclick="setTimeframeMode('week', true)">📆 សប្តាហ៍នេះ</button>
+                    <button type="button" id="tf-month" class="tf-btn active" onclick="setTimeframeMode('month', true)">🗓️ ខែនេះ / តាមខែ</button>
                     <button type="button" id="tf-all" class="tf-btn" onclick="setTimeframeMode('all')">🌐 ទាំងអស់</button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <input type="date" id="tfDateInput" class="input-control" style="width: 155px; font-weight: 700; display: none;" onchange="onTimeframePickerChange()">
-                    <input type="month" id="tfMonthInput" class="input-control" style="width: 155px; font-weight: 700;" onchange="onTimeframePickerChange()">
-                    <span id="tfRangeBadge" style="font-size: 12px; font-weight: 700; color: var(--primary-dark); background: var(--primary-light); padding: 5px 10px; border-radius: 8px;">ខែនេះ</span>
+                    <input type="date" id="tfDateInput" class="input-control" style="width: auto; padding: 6px 10px; font-weight: 700; display: none;" onchange="onTimeframePickerChange()">
+                    <input type="month" id="tfMonthInput" class="input-control" style="width: auto; padding: 6px 10px; font-weight: 700;" onchange="onTimeframePickerChange()">
+                    <span id="tfRangeBadge" class="tag-pill" style="background: var(--primary-light); color: var(--primary-dark); padding: 5px 10px; font-size: 12px;">🗓️ ខែនេះ</span>
                 </div>
             </div>
 
-            <!-- 4-Column KPI Summary Cards -->
-            <section id="kpiGridSection" class="kpi-grid">
-                <!-- Card 1: Total Net Balance -->
+            <!-- AT-A-GLANCE DAY / WEEK / MONTH COMPARISON STRIP -->
+            <div id="dwmStripSection" class="dwm-strip">
+                <div id="dwm-card-day" class="dwm-card" onclick="setTimeframeMode('day', true)">
+                    <div class="dwm-head">
+                        <span>📅 សរុបថ្ងៃនេះ</span>
+                        <span id="dwmDayRange" class="dwm-range">—</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmDayInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmDayExp">0 ៛</span></span>
+                    </div>
+                </div>
+                <div id="dwm-card-week" class="dwm-card" onclick="setTimeframeMode('week', true)">
+                    <div class="dwm-head">
+                        <span>📆 សរុបសប្តាហ៍នេះ</span>
+                        <span id="dwmWeekRange" class="dwm-range">—</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmWeekInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmWeekExp">0 ៛</span></span>
+                    </div>
+                </div>
+                <div id="dwm-card-month" class="dwm-card active-period" onclick="setTimeframeMode('month', true)">
+                    <div class="dwm-head">
+                        <span>🗓️ សរុបខែនេះ</span>
+                        <span id="dwmMonthRange" class="dwm-range">—</span>
+                    </div>
+                    <div class="dwm-metrics">
+                        <span style="color: var(--income);">↓ <span id="dwmMonthInc">0 ៛</span></span>
+                        <span style="color: var(--expense);">↑ <span id="dwmMonthExp">0 ៛</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 KPI CARDS (WITH CASH VS BANK DUAL-CURRENCY BREAKDOWN) -->
+            <div id="kpiGridSection" class="kpi-grid">
                 <div class="kpi-card hero-bal">
                     <div>
                         <div class="kpi-top">
-                            <span class="kpi-label" id="balTitleLbl">សមតុល្យសរុប (ខែនេះ)</span>
-                            <div class="kpi-icon" style="background: var(--primary-light); color: var(--primary-dark);">💰</div>
+                            <span id="balTitleLbl" class="kpi-label">សមតុល្យសរុប</span>
+                            <div class="kpi-icon" style="background: var(--primary-light); color: var(--primary);">💰</div>
                         </div>
                         <div id="kpiTotalBal" class="kpi-val" style="color: var(--primary-dark);">0 ៛</div>
                         <div id="kpiSubBal" class="kpi-sub">≈ $0.00</div>
                     </div>
                     <div class="kpi-breakdown">
-                        <div class="kb-row">
-                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
-                            <span id="balCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
-                        <div class="kb-row">
-                            <span class="kb-badge bank">🏦 ធនាគារ</span>
-                            <span id="balBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
+                        <div class="kb-row"><span class="kb-badge cash">💵 សាច់ប្រាក់</span><span id="balCashNum" class="kb-num">0 ៛</span></div>
+                        <div class="kb-row"><span class="kb-badge bank">🏦 ធនាគារ</span><span id="balBankNum" class="kb-num">0 ៛</span></div>
                     </div>
                 </div>
 
-                <!-- Card 2: Total Income (Cash vs Bank Breakdown) -->
                 <div class="kpi-card">
                     <div>
                         <div class="kpi-top">
@@ -1167,18 +1232,11 @@
                         <div id="kpiSubInc" class="kpi-sub">≈ $0.00</div>
                     </div>
                     <div class="kpi-breakdown">
-                        <div class="kb-row">
-                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
-                            <span id="incCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
-                        <div class="kb-row">
-                            <span class="kb-badge bank">🏦 ធនាគារ</span>
-                            <span id="incBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
+                        <div class="kb-row"><span class="kb-badge cash">💵 សាច់ប្រាក់</span><span id="incCashNum" class="kb-num">0 ៛</span></div>
+                        <div class="kb-row"><span class="kb-badge bank">🏦 ធនាគារ</span><span id="incBankNum" class="kb-num">0 ៛</span></div>
                     </div>
                 </div>
 
-                <!-- Card 3: Total Expense (Cash vs Bank Breakdown) -->
                 <div class="kpi-card">
                     <div>
                         <div class="kpi-top">
@@ -1189,19 +1247,12 @@
                         <div id="kpiSubExp" class="kpi-sub">≈ $0.00</div>
                     </div>
                     <div class="kpi-breakdown">
-                        <div class="kb-row">
-                            <span class="kb-badge cash">💵 សាច់ប្រាក់</span>
-                            <span id="expCashNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
-                        <div class="kb-row">
-                            <span class="kb-badge bank">🏦 ធនាគារ</span>
-                            <span id="expBankNum" class="kb-num">0 ៛ ≈ $0.00</span>
-                        </div>
+                        <div class="kb-row"><span class="kb-badge cash">💵 សាច់ប្រាក់</span><span id="expCashNum" class="kb-num">0 ៛</span></div>
+                        <div class="kb-row"><span class="kb-badge bank">🏦 ធនាគារ</span><span id="expBankNum" class="kb-num">0 ៛</span></div>
                     </div>
                 </div>
 
-                <!-- Card 4: Total Savings -->
-                <div class="kpi-card">
+                <div class="kpi-card" style="cursor: pointer;" onclick="switchView('savings')">
                     <div>
                         <div class="kpi-top">
                             <span class="kpi-label">ប្រាក់សន្សំសរុប</span>
@@ -1211,86 +1262,42 @@
                         <div id="kpiSubSav" class="kpi-sub">≈ $0.00</div>
                     </div>
                     <div class="kpi-breakdown">
-                        <div class="kb-row">
-                            <span style="color: var(--text-muted); font-weight: 700;">គោលដៅសកម្ម</span>
-                            <span id="savGoalCount" class="kb-num">0 គោលដៅ</span>
-                        </div>
-                        <div class="kb-row">
-                            <button type="button" class="btn btn-secondary btn-sm" style="width: 100%; padding: 3px 8px;" onclick="switchView('savings')">គ្រប់គ្រងប្រាក់សន្សំ →</button>
-                        </div>
+                        <div class="kb-row"><span style="color: var(--text-muted);">គោលដៅកំពុងសន្សំ</span><span id="savGoalCount" class="kb-num">0 គោលដៅ</span></div>
+                        <div style="font-size: 11px; color: var(--savings); font-weight: 700;">ចុចដើម្បីគ្រប់គ្រង →</div>
                     </div>
                 </div>
-            </section>
-
-            <!-- At-a-Glance Day / Week / Month Comparison Strip -->
-            <section id="dwmStripSection" class="dwm-strip">
-                <div id="dwm-card-day" class="dwm-card" onclick="setTimeframeMode('day', true)">
-                    <div class="dwm-head">
-                        <span>📅 សង្ខេបថ្ងៃនេះ</span>
-                        <span id="dwmDayRange" class="dwm-range">ថ្ងៃនេះ</span>
-                    </div>
-                    <div class="dwm-metrics">
-                        <span style="color: var(--income);">↓ <span id="dwmDayInc">0 ៛</span></span>
-                        <span style="color: var(--expense);">↑ <span id="dwmDayExp">0 ៛</span></span>
-                    </div>
-                </div>
-                <div id="dwm-card-week" class="dwm-card" onclick="setTimeframeMode('week', true)">
-                    <div class="dwm-head">
-                        <span>📆 សង្ខេបសប្តាហ៍នេះ</span>
-                        <span id="dwmWeekRange" class="dwm-range">ច័ន្ទ - អាទិត្យ</span>
-                    </div>
-                    <div class="dwm-metrics">
-                        <span style="color: var(--income);">↓ <span id="dwmWeekInc">0 ៛</span></span>
-                        <span style="color: var(--expense);">↑ <span id="dwmWeekExp">0 ៛</span></span>
-                    </div>
-                </div>
-                <div id="dwm-card-month" class="dwm-card active-period" onclick="setTimeframeMode('month', true)">
-                    <div class="dwm-head">
-                        <span>🗓️ សង្ខេបខែនេះ</span>
-                        <span id="dwmMonthRange" class="dwm-range">ខែនេះ</span>
-                    </div>
-                    <div class="dwm-metrics">
-                        <span style="color: var(--income);">↓ <span id="dwmMonthInc">0 ៛</span></span>
-                        <span style="color: var(--expense);">↑ <span id="dwmMonthExp">0 ៛</span></span>
-                    </div>
-                </div>
-            </section>
+            </div>
 
             <!-- VIEW 1: DASHBOARD -->
-            <div id="view-dashboard" class="view-pane active">
+            <section id="view-dashboard" class="view-pane active">
                 <div class="dash-split">
-                    <!-- Left: Recent Transactions -->
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">🕒 ប្រតិបត្តិការថ្មីៗ</h3>
                             <div style="display: flex; gap: 6px;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="switchView('transactions')">មើលទាំងអស់ →</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 ម្តងច្រើន</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="switchView('transactions')">មើលទាំងអស់ →</button>
                             </div>
                         </div>
 
-                        <!-- Desktop Table -->
                         <div class="table-wrap desktop-table-only">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>ប្រភេទ</th>
+                                        <th>មុខទំនិញ</th>
                                         <th>ការទូទាត់</th>
                                         <th>កាលបរិច្ឆេទ</th>
                                         <th>កំណត់ចំណាំ</th>
-                                        <th style="text-align: right;">ចំនួនទឹកប្រាក់</th>
+                                        <th style="text-align: right;">ទឹកប្រាក់</th>
                                         <th style="text-align: center;">កែ/លុប</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recentTableBody"></tbody>
                             </table>
                         </div>
-
-                        <!-- Mobile Cards -->
                         <div id="recentMobileCards" class="mobile-tx-cards"></div>
                     </div>
 
-                    <!-- Right: Category Breakdown & Top Savings -->
                     <div>
                         <div class="card">
                             <div class="card-header">
@@ -1302,32 +1309,35 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">🐷 គោលដៅប្រាក់សន្សំ</h3>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="openGoalModal()">+ បង្កើតគោលដៅ</button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="openGoalModal()">+ បង្កើតថ្មី</button>
                             </div>
                             <div id="dashSavingsPreview"></div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- VIEW 2: ALL TRANSACTIONS -->
-            <div id="view-transactions" class="view-pane">
+            <section id="view-transactions" class="view-pane">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">📋 បញ្ជីប្រតិបត្តិការទាំងអស់</h3>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                             <button type="button" class="btn btn-secondary btn-sm" onclick="openBulkModal()">📑 កត់ត្រាម្តងច្រើន</button>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="exportCSV(true)">📥 Excel ខែនេះ</button>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="openTxModal()">➕ កត់ត្រាថ្មី</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="exportCSV(true)">📥 Excel តាមពេលនេះ</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openTxModal()">+ កត់ត្រាថ្មី</button>
                         </div>
                     </div>
 
-                    <!-- Filter Bar -->
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center;">
-                        <input type="text" id="searchInput" class="input-control" style="flex: 2; min-width: 200px;" placeholder="🔍 ស្វែងរកកំណត់ចំណាំ ធនាគារ ឬទឹកប្រាក់ (ចុច /)..." oninput="renderAll()">
-                        
-                        <select id="paymentFilterSelect" class="input-control" style="flex: 1; min-width: 175px; font-weight: 700;" onchange="renderAll()">
-                            <option value="all">💳 គ្រប់ការទូទាត់ (សាច់ប្រាក់ + ធនាគារ)</option>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-bottom: 14px;">
+                        <input type="text" id="searchInput" class="input-control" oninput="renderAll()" placeholder="🔍 ស្វែងរកកំណត់ចំណាំ ឬធនាគារ...">
+                        <div class="seg-control" style="justify-content: space-between;">
+                            <button type="button" id="seg-all" class="seg-btn active" style="flex:1;" onclick="setTypeFilter('all')">ទាំងអស់</button>
+                            <button type="button" id="seg-income" class="seg-btn" style="flex:1;" onclick="setTypeFilter('income')">ចំណូល</button>
+                            <button type="button" id="seg-expense" class="seg-btn" style="flex:1;" onclick="setTypeFilter('expense')">ចំណាយ</button>
+                        </div>
+                        <select id="paymentFilterSelect" class="input-control" style="font-weight: 700;" onchange="renderAll()">
+                            <option value="all">💳 គ្រប់វិធីសាស្ត្រទូទាត់ (សាច់ប្រាក់ + ធនាគារ)</option>
                             <option value="cash">💵 សាច់ប្រាក់សុទ្ធ (Cash)</option>
                             <option value="bank">🏦 គ្រប់កុងធនាគារ (All Banks)</option>
                             <option value="bank:ABA Bank">🏦 ABA Bank</option>
@@ -1337,25 +1347,18 @@
                             <option value="bank:Sathapana Bank">🏦 ស្ថាបនា (Sathapana)</option>
                             <option value="bank:AMK">🏦 AMK</option>
                         </select>
-
-                        <div class="seg-control">
-                            <button type="button" id="seg-all" class="seg-btn active" onclick="setTypeFilter('all')">ទាំងអស់</button>
-                            <button type="button" id="seg-income" class="seg-btn" onclick="setTypeFilter('income')">ចំណូល</button>
-                            <button type="button" id="seg-expense" class="seg-btn" onclick="setTypeFilter('expense')">ចំណាយ</button>
-                        </div>
-
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">គ្រប់ពេល</button>
-                        <span id="txCountBadge" style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-left: auto;">0 ប្រតិបត្តិការ</span>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">🔄 បង្ហាញគ្រប់ពេល</button>
                     </div>
 
-                    <!-- Desktop Full Table -->
+                    <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 10px;" id="txCountBadge">0 ប្រតិបត្តិការ</div>
+
                     <div class="table-wrap desktop-table-only">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ប្រភេទ</th>
+                                    <th>មុខទំនិញ</th>
                                     <th>កាបូបលុយ</th>
-                                    <th>វិធីសាស្ត្រទូទាត់</th>
+                                    <th>ការទូទាត់ / ធនាគារ</th>
                                     <th>កាលបរិច្ឆេទ</th>
                                     <th>កំណត់ចំណាំ</th>
                                     <th style="text-align: right;">ចំនួនទឹកប្រាក់</th>
@@ -1365,427 +1368,386 @@
                             <tbody id="fullTableBody"></tbody>
                         </table>
                     </div>
-
-                    <!-- Mobile Full Cards -->
                     <div id="fullMobileCards" class="mobile-tx-cards"></div>
                 </div>
-            </div>
+            </section>
 
-            <!-- VIEW 3: MONTHLY & 12-MONTH YEARLY REPORTS -->
-            <div id="view-reports" class="view-pane">
+            <!-- VIEW 3: MONTHLY REPORTS -->
+            <section id="view-reports" class="view-pane">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">📊 របាយការណ៍សរុបប្រចាំឆ្នាំ (១២ ខែ)</h3>
+                        <h3 class="card-title">📈 របាយការណ៍សរុបប្រចាំខែ (១២ ខែ)</h3>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <select id="reportYearSel" class="input-control" style="width: 125px; font-weight: 700;" onchange="renderReports()"></select>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="exportCSV(false)">📥 ទាញយក Excel ទាំងអស់</button>
+                            <select id="reportYearSel" class="input-control" style="width: auto; font-weight: 700;" onchange="renderReports()"></select>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="exportCSV(false)">📥 Excel ទាំងអស់</button>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 16px; font-size: 12.5px; font-weight: 700; margin-bottom: 10px;">
-                        <span style="color: var(--income);">■ ចំណូលប្រចាំខែ</span>
-                        <span style="color: var(--expense);">■ ចំណាយប្រចាំខែ</span>
+                    <div style="display: flex; gap: 16px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
+                        <span style="color: var(--income);">■ ចំណូលសរុប</span>
+                        <span style="color: var(--expense);">■ ចំណាយសរុប</span>
                     </div>
                     <div class="chart-box">
                         <div id="yearlyChartGrid" class="bar-chart-grid"></div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">📅 សរុបចំណូល-ចំណាយតាមខែនីមួយៗ (ចុចលើខែដើម្បីមើលលម្អិត)</h3>
-                    </div>
-                    <div id="monthlyReportList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-                </div>
-            </div>
+                <div id="monthlyReportList" style="display: grid; gap: 12px;"></div>
+            </section>
 
             <!-- VIEW 4: SAVINGS GOALS -->
-            <div id="view-savings" class="view-pane">
+            <section id="view-savings" class="view-pane">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">🐷 គ្រប់គ្រងគោលដៅប្រាក់សន្សំ (Savings Goals)</h3>
-                        <button type="button" class="btn btn-primary" onclick="openGoalModal()">+ បង្កើតគោលដៅថ្មី</button>
+                        <h3 class="card-title">🐷 គ្រប់គ្រងគោលដៅប្រាក់សន្សំ</h3>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openGoalModal()">+ បង្កើតគោលដៅថ្មី</button>
                     </div>
-                    <div id="fullSavingsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px;"></div>
+                    <div id="fullSavingsList"></div>
                 </div>
-            </div>
+            </section>
 
             <!-- VIEW 5: SETTINGS, EXCEL/WORD IMPORT & BACKUP -->
-            <div id="view-settings" class="view-pane">
-                <div class="dash-split">
-                    <div>
-                        <!-- Currency & Exchange Rate -->
-                        <div class="card">
-                            <h3 class="card-title" style="margin-bottom: 12px;">💱 រូបិយប័ណ្ណ និងអត្រាប្តូរប្រាក់</h3>
-                            <div class="grid-2">
-                                <div class="form-grp">
-                                    <label class="form-lbl">រូបិយប័ណ្ណគោល</label>
-                                    <select id="setCurrency" class="input-control" onchange="saveSettingsFromUI()">
-                                        <option value="KHR">ប្រាក់រៀល (៛)</option>
-                                        <option value="USD">ប្រាក់ដុល្លារ ($)</option>
-                                    </select>
-                                </div>
-                                <div class="form-grp">
-                                    <label class="form-lbl">អត្រាប្តូរប្រាក់ ($1 = ? ៛)</label>
-                                    <input type="number" id="setRate" class="input-control" value="4000" min="100" onchange="saveSettingsFromUI()">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Multiple Wallets -->
-                        <div class="card">
-                            <h3 class="card-title" style="margin-bottom: 12px;">👛 គ្រប់គ្រងកាបូបលុយ (Multiple Wallets)</h3>
-                            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                                <select id="addWalletEmoji" class="input-control" style="width: 70px; text-align: center;">
-                                    <option value="💼">💼</option>
-                                    <option value="🏠">🏠</option>
-                                    <option value="👤">👤</option>
-                                    <option value="🏦">🏦</option>
-                                    <option value="🛒">🛒</option>
-                                    <option value="✈️">✈️</option>
-                                </select>
-                                <input type="text" id="addWalletName" class="input-control" placeholder="ឈ្មោះកាបូបលុយថ្មី...">
-                                <button type="button" class="btn btn-primary" onclick="createWallet()">បន្ថែម</button>
-                            </div>
-                            <div id="settingsWalletList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                        </div>
-
-                        <!-- PIN Security -->
-                        <div class="card">
-                            <h3 class="card-title" style="margin-bottom: 8px;">🔐 លេខកូដសម្ងាត់ការពារកម្មវិធី (4-Digit PIN)</h3>
-                            <p id="pinDescText" style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">បច្ចុប្បន្ន៖ បានបិទលេខកូដសម្ងាត់</p>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <input type="password" id="pinSetupInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" class="input-control" style="width: 140px; text-align: center; letter-spacing: 6px; font-weight: 800;" placeholder="••••">
-                                <button type="button" class="btn btn-primary" onclick="enablePinLock()">កំណត់ PIN</button>
-                                <button type="button" id="btnRemovePin" class="btn btn-danger" style="display: none;" onclick="disablePinLock()">បិទ PIN</button>
-                            </div>
-                        </div>
+            <section id="view-settings" class="view-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💱 រូបិយប័ណ្ណ និងអត្រាប្តូរប្រាក់</h3>
                     </div>
-
-                    <div>
-                        <!-- Excel / Word Table Smart Import -->
-                        <div class="card">
-                            <h3 class="card-title" style="margin-bottom: 8px;">📑 នាំចូលទិន្នន័យពី Excel (CSV) ឬ Word</h3>
-                            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
-                                ទាញយកគំរូ Excel ឬ Copy តារាងពី <strong>Microsoft Excel / Word</strong> មក Paste ចូលខាងក្រោម ប្រព័ន្ធនឹងវិភាគបំបែកជួរឈរដោយស្វ័យប្រវត្តិ។
-                            </p>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="downloadExcelTemplate()">⬇️ ទាញយកគំរូ Excel</button>
-                                <label class="btn btn-primary btn-sm" style="cursor: pointer;">
-                                    📂 រើសឯកសារ CSV/TXT
-                                    <input type="file" accept=".csv,.tsv,.txt" style="display: none;" onchange="handleCsvUpload(event)">
-                                </label>
-                            </div>
-                            <textarea id="smartPasteBox" rows="4" class="input-control" style="font-size: 12px; margin-bottom: 8px;" placeholder="Paste តារាងពី Excel ឬ Word នៅទីនេះ (កាលបរិច្ឆេទ | ចំណូល/ចំណាយ | ការទូទាត់ | ទឹកប្រាក់ | កំណត់ចំណាំ)..."></textarea>
-                            <button type="button" class="btn btn-income" style="width: 100%;" onclick="parseAndImportText()">⚡ វិភាគ និងបញ្ចូលទិន្នន័យស្វ័យប្រវត្តិ</button>
+                    <div class="grid-2">
+                        <div class="form-grp">
+                            <label class="form-lbl">រូបិយប័ណ្ណគោល</label>
+                            <select id="setCurrency" class="input-control" onchange="saveSettingsFromUI()">
+                                <option value="KHR">ប្រាក់រៀល (៛ KHR)</option>
+                                <option value="USD">ប្រាក់ដុល្លារ ($ USD)</option>
+                            </select>
                         </div>
-
-                        <!-- Backup & Restore JSON -->
-                        <div class="card">
-                            <h3 class="card-title" style="margin-bottom: 8px;">💾 បម្រុងទុក និងផ្ទេរទិន្នន័យ (Backup & Restore)</h3>
-                            <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
-                                ប្រើឯកសារ JSON ដើម្បីផ្ទេរទិន្នន័យរវាង <strong>កុំព្យូទ័រ និង ទូរសព្ទដៃ</strong> ឬរក្សាទុកការពារការបាត់បង់។
-                            </p>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
-                                <button type="button" class="btn btn-primary" style="flex: 1;" onclick="exportBackupJSON()">⬇️ Backup (Export JSON)</button>
-                                <label class="btn btn-secondary" style="flex: 1; cursor: pointer;">
-                                    ⬆️ Restore (Import JSON)
-                                    <input type="file" accept=".json" style="display: none;" onchange="handleBackupUpload(event)">
-                                </label>
-                            </div>
-                            <button type="button" id="installPwaBtn" class="btn btn-secondary" style="width: 100%; display: none;" onclick="installPWA()">📲 ដំឡើងកម្មវិធីលើអេក្រង់ (Install App)</button>
+                        <div class="form-grp">
+                            <label class="form-lbl">អត្រាប្តូរប្រាក់ (១ ដុល្លារ = ? រៀល)</label>
+                            <input type="number" id="setRate" class="input-control" value="4000" onchange="saveSettingsFromUI()">
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">👛 គ្រប់គ្រងកាបូបលុយ (Multiple Wallets)</h3>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <select id="addWalletEmoji" class="input-control" style="width: 72px;">
+                            <option value="👤">👤</option>
+                            <option value="🏠">🏠</option>
+                            <option value="💼">💼</option>
+                            <option value="🏦">🏦</option>
+                            <option value="🏪">🏪</option>
+                        </select>
+                        <input type="text" id="addWalletName" class="input-control" placeholder="ឈ្មោះកាបូបថ្មី (ឧ. លុយហាង)...">
+                        <button type="button" class="btn btn-primary" onclick="createWallet()">បន្ថែម</button>
+                    </div>
+                    <div id="settingsWalletList" style="display: grid; gap: 8px;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📥 នាំចូលទិន្នន័យពី Excel (CSV) ឬ Copy-Paste ពី Word/Excel</h3>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">
+                        អ្នកអាចជ្រើសរើសឯកសារ CSV ឬ Copy តារាងពី <strong>Microsoft Excel / Word</strong> មក Paste ខាងក្រោម ប្រព័ន្ធនឹងបំបែកជួរឈរដោយស្វ័យប្រវត្តិ។
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="downloadExcelTemplate()">⬇️ ទាញយកគំរូ Excel</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('csvFileInp').click()">📂 ជ្រើសរើសឯកសារ CSV</button>
+                        <input type="file" id="csvFileInp" accept=".csv,.txt" style="display: none;" onchange="handleCsvUpload(event)">
+                    </div>
+                    <textarea id="smartPasteBox" class="input-control" rows="4" placeholder="Paste ទិន្នន័យពី Excel ឬ Word នៅទីនេះ (ឧ. 2026-11-16 | ចំណាយ | សាច់ប្រាក់ | អាហារ | 15000 | KHR | បាយថ្ងៃត្រង់)..."></textarea>
+                    <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="parseAndImportText()">⚡ នាំចូលទិន្នន័យដោយស្វ័យប្រវត្តិ</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💾 បម្រុងទុក និងផ្ទេរទិន្នន័យ (Backup & Restore JSON)</h3>
+                    </div>
+                    <div class="grid-2">
+                        <button type="button" class="btn btn-secondary" onclick="exportBackupJSON()">📤 ទាញយក Backup (JSON)</button>
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('jsonFileInp').click()">📥 បញ្ចូល Backup (JSON)</button>
+                        <input type="file" id="jsonFileInp" accept=".json" style="display: none;" onchange="handleBackupUpload(event)">
+                    </div>
+                    <button type="button" id="installPwaBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px; display: none;" onclick="installPWA()">📲 ដំឡើងកម្មវិធីលើអេក្រង់ (Install App)</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔐 លេខកូដសម្ងាត់ (4-Digit PIN Lock)</h3>
+                    </div>
+                    <p id="pinDescText" style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px;">បច្ចុប្បន្ន៖ បានបិទលេខកូដសម្ងាត់</p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <input type="password" id="pinSetupInput" class="input-control" maxlength="4" inputmode="numeric" placeholder="លេខ ៤ ខ្ទង់ (ឧ. 1234)" style="max-width: 180px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="enablePinLock()">កំណត់ PIN</button>
+                        <button type="button" id="btnRemovePin" class="btn btn-danger btn-sm" style="display: none;" onclick="disablePinLock()">បិទ PIN</button>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
+    <!-- MOBILE BOTTOM NAVIGATION -->
     <nav class="mobile-bottom-nav">
         <button type="button" id="mnav-dashboard" class="m-bnav-btn active" onclick="switchView('dashboard')">
-            <span class="m-bnav-ico">🏠</span>
-            <span>ទំព័រដើម</span>
+            <span class="m-bnav-ico">🏠</span><span>ទំព័រដើម</span>
         </button>
         <button type="button" id="mnav-transactions" class="m-bnav-btn" onclick="switchView('transactions')">
-            <span class="m-bnav-ico">📋</span>
-            <span>ប្រតិបត្តិការ</span>
+            <span class="m-bnav-ico">📋</span><span>ប្រតិបត្តិការ</span>
         </button>
-        <button type="button" class="m-fab" onclick="openTxModal()" title="កត់ត្រាថ្មី">+</button>
+        <button type="button" class="m-fab" onclick="openTxModal()" aria-label="កត់ត្រាថ្មី">+</button>
         <button type="button" id="mnav-reports" class="m-bnav-btn" onclick="switchView('reports')">
-            <span class="m-bnav-ico">📊</span>
-            <span>របាយការណ៍</span>
+            <span class="m-bnav-ico">📈</span><span>របាយការណ៍</span>
         </button>
         <button type="button" id="mnav-settings" class="m-bnav-btn" onclick="switchView('settings')">
-            <span class="m-bnav-ico">⚙️</span>
-            <span>ការកំណត់</span>
+            <span class="m-bnav-ico">⚙️</span><span>ការកំណត់</span>
         </button>
     </nav>
 
     <!-- MODAL 1: SINGLE TRANSACTION (CREATE / EDIT) -->
-    <div id="txModal" class="modal-overlay" onclick="if(event.target===this) closeTxModal()">
+    <div id="txModal" class="modal-overlay">
         <div class="modal-dialog">
             <div class="modal-head">
                 <h3 id="txModalTitle" class="modal-title">➕ កត់ត្រាចំណូល-ចំណាយថ្មី</h3>
                 <button type="button" class="modal-close" onclick="closeTxModal()">✕</button>
             </div>
-
             <div class="modal-body">
-            <form onsubmit="submitTxForm(event)">
-                <input type="hidden" id="editTxId">
-                <input type="hidden" id="formTxType" value="expense">
-                <input type="hidden" id="formTxCat" value="food">
-                <input type="hidden" id="formPayMethod" value="cash">
+                <form id="txForm" onsubmit="submitTxForm(event)">
+                    <input type="hidden" id="editTxId">
+                    <input type="hidden" id="formTxType" value="expense">
+                    <input type="hidden" id="formTxCat" value="food">
+                    <input type="hidden" id="formPayMethod" value="cash">
 
-                <!-- Type Switch -->
-                <div class="grid-2" style="margin-bottom: 12px;">
-                    <button type="button" id="btnFormExp" class="btn btn-danger" style="border: 2px solid var(--expense);" onclick="setFormType('expense')">↑ ចំណាយ (-)</button>
-                    <button type="button" id="btnFormInc" class="btn btn-secondary" onclick="setFormType('income')">↓ ចំណូល (+)</button>
-                </div>
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="closeTxModal(); openBulkModal();">📑 ប្តូរទៅកត់ត្រាម្តងច្រើនជួរ →</button>
+                    </div>
 
-                <!-- Wallet & Date -->
-                <div class="grid-2">
+                    <div class="grid-2" style="margin-bottom: 12px;">
+                        <button type="button" id="btnFormExp" class="btn btn-danger" style="border: 2px solid var(--expense);" onclick="setFormType('expense')">↑ ចំណាយ</button>
+                        <button type="button" id="btnFormInc" class="btn btn-secondary" onclick="setFormType('income')">↓ ចំណូល</button>
+                    </div>
+
+                    <div class="grid-2 form-grp">
+                        <div>
+                            <label class="form-lbl">កាបូបលុយ</label>
+                            <select id="formWalletId" class="input-control"></select>
+                        </div>
+                        <div>
+                            <label class="form-lbl">កាលបរិច្ឆេទ *</label>
+                            <input type="date" id="formDate" class="input-control" onchange="renderDailyNoteChips()" required>
+                        </div>
+                    </div>
+
                     <div class="form-grp">
-                        <label class="form-lbl">កាបូបលុយ *</label>
-                        <select id="formWalletId" class="input-control" style="font-weight: 700;"></select>
+                        <label class="form-lbl">វិធីសាស្ត្រទូទាត់ (សាច់ប្រាក់ ឬ កុងធនាគារ) *</label>
+                        <div class="grid-2">
+                            <button type="button" id="btnFormCash" class="btn" style="background: var(--cash-bg); color: var(--cash); border: 2px solid var(--cash);" onclick="setFormPayMethod('cash')">💵 សាច់ប្រាក់សុទ្ធ</button>
+                            <button type="button" id="btnFormBank" class="btn btn-secondary" onclick="setFormPayMethod('bank')">🏦 កុងធនាគារ (QR)</button>
+                        </div>
+                        <div id="bankSelectBox" style="display: none; margin-top: 8px;">
+                            <select id="formBankName" class="input-control" style="font-weight: 700;">
+                                <option value="ABA Bank">🏦 ABA Bank</option>
+                                <option value="ACLEDA Bank">🏦 អេស៊ីលីដា (ACLEDA Bank)</option>
+                                <option value="Wing Bank">🏦 Wing Bank</option>
+                                <option value="Canadia Bank">🏦 កាណាឌីយ៉ា (Canadia Bank)</option>
+                                <option value="Sathapana Bank">🏦 ស្ថាបនា (Sathapana Bank)</option>
+                                <option value="AMK">🏦 AMK</option>
+                                <option value="ធនាគារផ្សេងៗ">🏦 ធនាគារផ្សេងៗ (KHQR)</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div class="form-grp">
-                        <label class="form-lbl">កាលបរិច្ឆេទ *</label>
-                        <input type="date" id="formDate" class="input-control" onchange="renderDailyNoteChips()" required>
+                        <label class="form-lbl">ចំនួនទឹកប្រាក់ *</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="formAmount" class="input-control" step="any" min="0.01" inputmode="decimal" placeholder="0" style="font-size: 18px; font-weight: 800;" required>
+                            <select id="formCurrency" class="input-control" style="width: 115px; font-weight: 800;" onchange="renderQuickAmountChips()">
+                                <option value="KHR">៛ រៀល</option>
+                                <option value="USD">$ ដុល្លារ</option>
+                            </select>
+                        </div>
+                        <div id="quickAmtChips" class="chips-row"></div>
                     </div>
-                </div>
 
-                <!-- Payment Method: Cash vs Cambodian Banks -->
-                <div class="form-grp">
-                    <label class="form-lbl">វិធីសាស្ត្រទូទាត់ (សាច់ប្រាក់ ឬ កុងធនាគារ) *</label>
-                    <div class="grid-2">
-                        <button type="button" id="btnFormCash" class="btn" style="background: var(--cash-bg); color: var(--cash); border: 2px solid var(--cash);" onclick="setFormPayMethod('cash')">💵 សាច់ប្រាក់សុទ្ធ</button>
-                        <button type="button" id="btnFormBank" class="btn btn-secondary" onclick="setFormPayMethod('bank')">🏦 កុងធនាគារ (QR)</button>
+                    <div class="form-grp">
+                        <label class="form-lbl">ប្រភេទមុខទំនិញ / ចំណូល *</label>
+                        <div id="formCatGrid" class="cat-picker"></div>
                     </div>
-                    <div id="bankSelectBox" style="display: none; margin-top: 8px;">
-                        <select id="formBankName" class="input-control" style="font-weight: 700; background: #f0f9ff;">
-                            <option value="ABA Bank">🏦 ABA Bank</option>
-                            <option value="ACLEDA Bank">🏦 អេស៊ីលីដា (ACLEDA Bank)</option>
-                            <option value="Wing Bank">🏦 Wing Bank</option>
-                            <option value="Canadia Bank">🏦 កាណាឌីយ៉ា (Canadia Bank)</option>
-                            <option value="Sathapana Bank">🏦 ស្ថាបនា (Sathapana Bank)</option>
-                            <option value="AMK">🏦 AMK</option>
-                            <option value="ធនាគារផ្សេងៗ">🏦 ធនាគារផ្សេងៗ (KHQR)</option>
-                        </select>
+
+                    <div class="form-grp">
+                        <label class="form-lbl">កំណត់ចំណាំ (ចងចាំកំណត់ចំណាំក្នុងថ្ងៃដដែល)</label>
+                        <input type="text" id="formNote" class="input-control" placeholder="ឧ. ផ្ទះមិត្តភក្តិ ក (ទិញស្រាបៀរ)...">
+                        <div id="dailyNoteChips" class="chips-row"></div>
                     </div>
-                </div>
 
-                <!-- Amount & Currency + Quick Chips -->
-                <div class="form-grp">
-                    <label class="form-lbl">ចំនួនទឹកប្រាក់ *</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" id="formAmount" class="input-control" step="any" min="0.01" inputmode="decimal" style="font-size: 18px; font-weight: 800; flex: 1;" placeholder="0" required>
-                        <select id="formCurrency" class="input-control" style="width: 110px; font-weight: 800;" onchange="renderQuickAmountChips()">
-                            <option value="KHR">រៀល (៛)</option>
-                            <option value="USD">ដុល្លារ ($)</option>
-                        </select>
-                    </div>
-                    <div id="quickAmtChips" class="chips-row"></div>
-                </div>
-
-                <!-- Category Picker -->
-                <div class="form-grp">
-                    <label class="form-lbl">ប្រភេទមុខទំនិញ / ចំណូល *</label>
-                    <div id="formCatGrid" class="cat-picker"></div>
-                </div>
-
-                <!-- Note + Daily Quick Note Chips -->
-                <div class="form-grp">
-                    <label class="form-lbl">កំណត់ចំណាំ (ស្រេចចិត្ត)</label>
-                    <input type="text" id="formNote" class="input-control" placeholder="ឧ. ផ្ទះមិត្តភក្តិ ក, ទិញម្ហូប, ប្រាក់ខែ...">
-                    <div id="dailyNoteChips" class="chips-row"></div>
-                </div>
-
-                <div style="display: flex; gap: 8px; margin-top: 14px;">
-                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeTxModal()">បោះបង់</button>
-                    <button type="submit" class="btn btn-primary" style="flex: 2;">💾 រក្សាទុកទិន្នន័យ</button>
-                </div>
-            </form>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14.5px; margin-top: 6px;">💾 រក្សាទុកប្រតិបត្តិការ</button>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- MODAL 2: BULK MULTI-ROW ENTRY -->
-    <div id="bulkModal" class="modal-overlay" onclick="if(event.target===this) closeBulkModal()">
+    <div id="bulkModal" class="modal-overlay">
         <div class="modal-dialog xl">
             <div class="modal-head">
                 <h3 class="modal-title">📑 កត់ត្រាម្តងច្រើនជួរ (Bulk Multi-Row Entry)</h3>
                 <button type="button" class="modal-close" onclick="closeBulkModal()">✕</button>
             </div>
-
             <div class="modal-body">
-            <div class="grid-2" style="margin-bottom: 12px;">
-                <div>
-                    <label class="form-lbl">កាបូបលុយ</label>
-                    <select id="bulkWalletSel" class="input-control" style="font-weight: 700;"></select>
+                <div class="grid-2 form-grp">
+                    <div>
+                        <label class="form-lbl">កាបូបលុយ</label>
+                        <select id="bulkWalletSel" class="input-control"></select>
+                    </div>
+                    <div>
+                        <label class="form-lbl">កាលបរិច្ឆេទរួម</label>
+                        <input type="date" id="bulkDateInput" class="input-control">
+                    </div>
                 </div>
-                <div>
-                    <label class="form-lbl">កាលបរិច្ឆេទរួម</label>
-                    <input type="date" id="bulkDateInput" class="input-control">
-                </div>
-            </div>
 
-            <div id="bulkRowsWrap" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+                <div id="bulkRowsWrap" style="display: grid; gap: 10px; margin-bottom: 12px;"></div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="appendBulkRows(3)">+ បន្ថែម ៣ ជួរទៀត</button>
-                <div style="display: flex; gap: 8px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeBulkModal()">បិទ</button>
+                <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="appendBulkRows(3)">+ បន្ថែម ៣ ជួរទៀត</button>
                     <button type="button" class="btn btn-primary" onclick="saveAllBulkRows()">💾 រក្សាទុកទាំងអស់</button>
                 </div>
-            </div>
             </div>
         </div>
     </div>
 
     <!-- MODAL 3: SAVINGS GOAL CREATE / EDIT -->
-    <div id="goalModal" class="modal-overlay" onclick="if(event.target===this) closeGoalModal()">
+    <div id="goalModal" class="modal-overlay">
         <div class="modal-dialog">
             <div class="modal-head">
                 <h3 id="goalModalTitle" class="modal-title">🐷 បង្កើតគោលដៅប្រាក់សន្សំ</h3>
                 <button type="button" class="modal-close" onclick="closeGoalModal()">✕</button>
             </div>
             <div class="modal-body">
-            <form onsubmit="submitGoalForm(event)">
-                <input type="hidden" id="editGoalId">
-                <div class="form-grp">
-                    <label class="form-lbl">ឈ្មោះគោលដៅសន្សំ *</label>
-                    <input type="text" id="goalNameInp" class="input-control" placeholder="ឧ. សន្សំទិញទូរសព្ទ, លុយបម្រុងគ្រាអាសន្ន..." required>
-                </div>
-                <div class="grid-2">
+                <form onsubmit="submitGoalForm(event)">
+                    <input type="hidden" id="editGoalId">
                     <div class="form-grp">
-                        <label class="form-lbl">ទឹកប្រាក់គោលដៅ *</label>
-                        <input type="number" id="goalTargetInp" class="input-control" step="any" min="1" required>
+                        <label class="form-lbl">ឈ្មោះគោលដៅសន្សំ *</label>
+                        <input type="text" id="goalNameInp" class="input-control" placeholder="ឧ. សន្សំទិញទូរសព្ទ ឬ លុយបម្រុង..." required>
+                    </div>
+                    <div class="grid-2 form-grp">
+                        <div>
+                            <label class="form-lbl">ចំនួនទឹកប្រាក់គោលដៅ *</label>
+                            <input type="number" id="goalTargetInp" class="input-control" step="any" min="1" inputmode="decimal" required>
+                        </div>
+                        <div>
+                            <label class="form-lbl">រូបិយប័ណ្ណ</label>
+                            <select id="goalCurrInp" class="input-control">
+                                <option value="KHR">៛ រៀល</option>
+                                <option value="USD">$ ដុល្លារ</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-grp">
-                        <label class="form-lbl">រូបិយប័ណ្ណ</label>
-                        <select id="goalCurrInp" class="input-control">
-                            <option value="KHR">រៀល (៛)</option>
-                            <option value="USD">ដុល្លារ ($)</option>
-                        </select>
+                        <label class="form-lbl">ប្រាក់សន្សំមានស្រាប់ដំបូង</label>
+                        <input type="number" id="goalSavedInp" class="input-control" step="any" min="0" inputmode="decimal" value="0">
                     </div>
-                </div>
-                <div class="form-grp">
-                    <label class="form-lbl">ប្រាក់សន្សំមានស្រាប់</label>
-                    <input type="number" id="goalSavedInp" class="input-control" step="any" min="0" value="0">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">💾 រក្សាទុកគោលដៅ</button>
-            </form>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">💾 រក្សាទុកគោលដៅ</button>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- MODAL 4: SAVINGS DEPOSIT / WITHDRAW -->
-    <div id="goalActionModal" class="modal-overlay" onclick="if(event.target===this) closeGoalActionModal()">
+    <div id="goalActionModal" class="modal-overlay">
         <div class="modal-dialog">
             <div class="modal-head">
                 <h3 id="goalActTitle" class="modal-title">ដាក់ប្រាក់សន្សំ</h3>
                 <button type="button" class="modal-close" onclick="closeGoalActionModal()">✕</button>
             </div>
             <div class="modal-body">
-            <form onsubmit="submitGoalAction(event)">
-                <input type="hidden" id="goalActId">
-                <input type="hidden" id="goalActMode" value="deposit">
-                <div class="form-grp">
-                    <label class="form-lbl">ចំនួនទឹកប្រាក់ (<span id="goalActCurr">៛</span>) *</label>
-                    <input type="number" id="goalActAmt" class="input-control" step="any" min="0.01" style="font-size: 18px; font-weight: 800;" required>
-                </div>
-                <div class="form-grp">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
-                        <input type="checkbox" id="goalAutoSync" checked>
-                        កត់ត្រាចូលបញ្ជីចំណូល-ចំណាយដោយស្វ័យប្រវត្តិ
+                <form onsubmit="submitGoalAction(event)">
+                    <input type="hidden" id="goalActId">
+                    <input type="hidden" id="goalActMode">
+                    <div class="form-grp">
+                        <label class="form-lbl">ចំនួនទឹកប្រាក់ (<span id="goalActCurr">៛</span>) *</label>
+                        <input type="number" id="goalActAmt" class="input-control" step="any" min="0.01" inputmode="decimal" required style="font-size: 18px; font-weight: 800;">
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 14px; cursor: pointer;">
+                        <input type="checkbox" id="goalAutoSync" checked> កត់ត្រាចូលបញ្ជីចំណូល-ចំណាយដោយស្វ័យប្រវត្តិ
                     </label>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">បញ្ជាក់</button>
-            </form>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">បញ្ជាក់</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 5: JSON BACKUP RESTORE (MERGE VS OVERWRITE) -->
-    <div id="mergeJsonModal" class="modal-overlay" onclick="if(event.target===this) closeMergeModal()">
+    <!-- MODAL 5: SMART MERGE VS OVERWRITE JSON -->
+    <div id="mergeJsonModal" class="modal-overlay">
         <div class="modal-dialog">
             <div class="modal-head">
-                <h3 class="modal-title">⬆️ ជ្រើសរើសរបៀបបញ្ចូលទិន្នន័យ Backup</h3>
+                <h3 class="modal-title">📥 ជម្រើសបញ្ចូលឯកសារ Backup JSON</h3>
                 <button type="button" class="modal-close" onclick="closeMergeModal()">✕</button>
             </div>
             <div class="modal-body">
-            <p id="mergeSummaryText" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;"></p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button type="button" class="btn btn-primary" onclick="executeJsonRestore('merge')">➕ បូកបញ្ចូលគ្នា (Merge - រក្សាទិន្នន័យចាស់ & បន្ថែមថ្មី)</button>
-                <button type="button" class="btn btn-danger" onclick="executeJsonRestore('overwrite')">🔄 ជំនួសទាំងស្រុង (Overwrite - លុបចាស់ដាក់ថ្មី)</button>
-                <button type="button" class="btn btn-secondary" onclick="closeMergeModal()">បោះបង់</button>
-            </div>
+                <p id="mergeSummaryText" style="font-size: 13.5px; margin-bottom: 14px;"></p>
+                <div style="display: grid; gap: 10px;">
+                    <button type="button" class="btn btn-primary" style="padding: 12px;" onclick="executeJsonRestore('merge')">➕ បូកបញ្ចូលគ្នា (Merge - រក្សាទិន្នន័យចាស់)</button>
+                    <button type="button" class="btn btn-danger" style="padding: 12px;" onclick="executeJsonRestore('overwrite')">🔄 ជំនួសទាំងស្រុង (Overwrite - លុបចាស់ដាក់ថ្មី)</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- TOAST -->
     <div id="toastBar" class="toast-bar">
-        <span id="toastText">ជោគជ័យ!</span>
-        <button type="button" id="toastUndo" style="display: none; background: #10b981; color: #fff; border: none; padding: 3px 10px; border-radius: 999px; font-weight: 800; cursor: pointer;" onclick="undoLastDelete()">ត្រឡប់វិញ (Undo)</button>
+        <span id="toastText">រួចរាល់</span>
+        <button type="button" id="toastUndo" style="display: none; background: #fbbf24; color: #0f172a; border: none; border-radius: 999px; padding: 3px 10px; font-weight: 800; cursor: pointer;" onclick="undoLastDelete()">ត្រឡប់ក្រោយ</button>
     </div>
 
     <script>
         // ==========================================
-        // 1. STORAGE KEYS & CATEGORIES
+        // 1. STATE & CONSTANTS
         // ==========================================
         const KEYS = {
-            TX: 'khmer_expense_tx_v3',
-            WALLETS: 'khmer_expense_wallets_v3',
-            GOALS: 'khmer_expense_savings_v3',
-            CFG: 'khmer_expense_settings_v3'
+            TX: 'kh_universal_tx_v5',
+            CFG: 'kh_universal_cfg_v5',
+            WALLETS: 'kh_universal_wallets_v5',
+            GOALS: 'kh_universal_goals_v5'
         };
 
         const CATEGORIES = {
             expense: [
-                { id: 'food', name: 'អាហារ', emoji: '🍜', bg: '#ffedd5', color: '#ea580c' },
-                { id: 'drink', name: 'ភេសជ្ជៈ/កាហ្វេ', emoji: '🧋', bg: '#fef3c7', color: '#d97706' },
-                { id: 'transport', name: 'ធ្វើដំណើរ/សាំង', emoji: '⛽', bg: '#dbeafe', color: '#2563eb' },
-                { id: 'shopping', name: 'ទិញទំនិញ', emoji: '🛍️', bg: '#fce7f3', color: '#db2777' },
-                { id: 'bills', name: 'ទឹក/ភ្លើង/អ៊ីនធឺណិត', emoji: '🧾', bg: '#e0e7ff', color: '#4f46e5' },
-                { id: 'health', name: 'សុខភាព', emoji: '💊', bg: '#dcfce7', color: '#16a34a' },
-                { id: 'social', name: 'កម្មវិធី/ជប់លៀង', emoji: '🍻', bg: '#fae8ff', color: '#c026d3' },
-                { id: 'other_exp', name: 'ចំណាយផ្សេងៗ', emoji: '📦', bg: '#f1f5f9', color: '#475569' }
+                { id: 'food', name: 'អាហារ', emoji: '🍜', color: '#f97316', bg: '#ffedd5' },
+                { id: 'drink', name: 'ភេសជ្ជៈ/កាហ្វេ', emoji: '☕', color: '#d97706', bg: '#fef3c7' },
+                { id: 'transport', name: 'ធ្វើដំណើរ', emoji: '🛵', color: '#0284c7', bg: '#e0f2fe' },
+                { id: 'shopping', name: 'ទិញទំនិញ', emoji: '🛍️', color: '#ec4899', bg: '#fce7f3' },
+                { id: 'bills', name: 'ទឹក/ភ្លើង/ទូរសព្ទ', emoji: '🧾', color: '#8b5cf6', bg: '#ede9fe' },
+                { id: 'health', name: 'សុខភាព', emoji: '💊', color: '#ef4444', bg: '#fee2e2' },
+                { id: 'family', name: 'គ្រួសារ/សង្គម', emoji: '🎁', color: '#14b8a6', bg: '#ccfbf1' },
+                { id: 'other_exp', name: 'ផ្សេងៗ', emoji: '📦', color: '#64748b', bg: '#f1f5f9' }
             ],
             income: [
-                { id: 'salary', name: 'ប្រាក់ខែ', emoji: '💵', bg: '#d1fae5', color: '#059669' },
-                { id: 'business', name: 'លក់ដូរ/អាជីវកម្ម', emoji: '🏪', bg: '#ccfbf1', color: '#0f766e' },
-                { id: 'bonus', name: 'ប្រាក់រង្វាន់/ថែមម៉ោង', emoji: '🎁', bg: '#fef3c7', color: '#d97706' },
-                { id: 'other_inc', name: 'ចំណូលផ្សេងៗ', emoji: '💰', bg: '#e0f2fe', color: '#0284c7' }
+                { id: 'salary', name: 'ប្រាក់ខែ', emoji: '💼', color: '#059669', bg: '#d1fae5' },
+                { id: 'business', name: 'អាជីវកម្ម/លក់ដូរ', emoji: '🏪', color: '#0d9488', bg: '#ccfbf1' },
+                { id: 'bonus', name: 'ប្រាក់លើកទឹកចិត្ត', emoji: '🎉', color: '#eab308', bg: '#fef9c3' },
+                { id: 'other_inc', name: 'ចំណូលផ្សេងៗ', emoji: '💰', color: '#3b82f6', bg: '#dbeafe' }
             ]
         };
 
+        let config = { currency: 'KHR', rate: 4000, pin: '' };
         let wallets = [];
         let transactions = [];
         let goals = [];
-        let config = { currency: 'KHR', rate: 4000, pin: '' };
-
         let activeWalletId = 'all';
-        let timeframeMode = 'month'; // 'day' | 'week' | 'month' | 'all'
+        let typeFilter = 'all';
+        let timeframeMode = 'month';
         let selectedDate = '';
         let selectedMonth = '';
-        let typeFilter = 'all';
+        let lastKnownTodayStr = '';
         let deletedTxBuffer = null;
         let pendingBackupData = null;
         let pinBuffer = '';
         let pwaPromptEvent = null;
-        let lastKnownTodayStr = '';
 
         function syncModalLockState() {
-            const anyOpen = document.querySelectorAll('.modal-overlay.open').length > 0;
+            const anyOpen = document.querySelector('.modal-overlay.open') !== null;
             document.documentElement.classList.toggle('modal-open', anyOpen);
             document.body.classList.toggle('modal-open', anyOpen);
-            if (!anyOpen) {
-                document.querySelectorAll('.modal-dialog').forEach(d => {
-                    d.style.maxHeight = '';
-                    d.style.height = '';
-                });
-            }
         }
 
         function setModalOpen(modalId, isOpen) {
@@ -1872,7 +1834,7 @@
         function getWeekBounds(dateStr) {
             const parts = (dateStr || getToday()).split('-').map(Number);
             const d = new Date(parts[0], parts[1] - 1, parts[2]);
-            const dayOfWeek = d.getDay(); // 0 (Sun) - 6 (Sat)
+            const dayOfWeek = d.getDay();
             const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
             const mon = new Date(d);
             mon.setDate(d.getDate() + diffToMon);
@@ -2034,7 +1996,6 @@
             const currentWeek = getWeekBounds(todayStr);
             const currentMonthStr = todayStr.slice(0, 7);
 
-            // Update timeframe badge & balance card title
             const badge = document.getElementById('tfRangeBadge');
             if (timeframeMode === 'day') {
                 const lbl = selectedDate === todayStr ? `ថ្ងៃនេះ (${fmtKhDate(selectedDate)})` : fmtKhDate(selectedDate);
@@ -2052,7 +2013,6 @@
                 document.getElementById('balTitleLbl').textContent = 'សមតុល្យសរុប (គ្រប់ពេល)';
             }
 
-            // Compute At-a-Glance Day / Week / Month Strip (filtered by active wallet)
             let dInc = 0, dExp = 0, wInc = 0, wExp = 0, mInc = 0, mExp = 0;
             transactions.forEach(tx => {
                 if (activeWalletId !== 'all' && tx.walletId !== activeWalletId) return;
@@ -2080,7 +2040,6 @@
             document.getElementById('dwmMonthInc').textContent = fmtMoney(mInc, config.currency);
             document.getElementById('dwmMonthExp').textContent = fmtMoney(mExp, config.currency);
 
-            // Active Period Transactions
             const periodTx = transactions.filter(tx => {
                 if (activeWalletId !== 'all' && tx.walletId !== activeWalletId) return false;
                 if (!matchesTimeframe(tx.date)) return false;
@@ -2126,21 +2085,17 @@
             document.getElementById('expCashNum').textContent = dual(expCash);
             document.getElementById('expBankNum').textContent = dual(expBank);
 
-            // Savings Total KPI
             let totalSav = 0;
             goals.forEach(g => { totalSav += convertAmt(g.saved, g.currency, config.currency); });
             document.getElementById('kpiTotalSav').textContent = fmtMoney(totalSav, config.currency);
             document.getElementById('kpiSubSav').textContent = `≈ ${fmtMoney(convertAmt(totalSav, config.currency, secCurr), secCurr)}`;
             document.getElementById('savGoalCount').textContent = `${goals.length} គោលដៅ`;
 
-            // Sort newest first
             const sorted = [...periodTx].sort((a, b) => b.date.localeCompare(a.date));
 
-            // Recent 6
             renderDesktopTable('recentTableBody', sorted.slice(0, 6), false);
             renderMobileCards('recentMobileCards', sorted.slice(0, 6));
 
-            // Filtered Full List
             const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
             const payFilter = document.getElementById('paymentFilterSelect')?.value || 'all';
 
@@ -2195,7 +2150,7 @@
                     <tr>
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
-                                <span style="width: 30px; height: 30px; border-radius: 8px; background: ${cat.bg}; display: inline-flex; align-items: center; justify-content: center;">${cat.emoji}</span>
+                                <span style="width: 30px; height: 30px; border-radius: 9px; background: ${cat.bg}; display: inline-flex; align-items: center; justify-content: center;">${cat.emoji}</span>
                                 <span>${cat.name}</span>
                             </div>
                         </td>
@@ -2242,8 +2197,8 @@
                         <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
                             <div style="width: 40px; height: 40px; border-radius: 12px; background: ${cat.bg}; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">${cat.emoji}</div>
                             <div style="min-width: 0; flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-weight: 800; font-size: 13.5px;">
-                                    <span>${cat.name}</span>
+                                <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 2px;">
+                                    <span style="font-weight: 800; font-size: 13.5px;">${cat.name}</span>
                                     ${payTag}
                                     ${wTag}
                                 </div>
@@ -2525,17 +2480,17 @@
             for (let i = 0; i < count; i++) {
                 const row = document.createElement('div');
                 row.className = 'bulk-item-row';
-                row.style.cssText = 'border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: #f8fafc;';
+                row.style.cssText = 'border: 1.5px solid var(--border); border-radius: 14px; padding: 10px; background: #f8fafc;';
                 row.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px;">
-                        <select class="input-control bk-type" style="padding: 7px; font-size: 12.5px; font-weight: 700;" onchange="this.closest('.bulk-item-row').querySelector('.bk-cat').innerHTML = catOptionsHTML(this.value)">
+                    <div class="bulk-grid">
+                        <select class="input-control bk-type" style="padding: 8px; font-weight: 700;" onchange="this.closest('.bulk-item-row').querySelector('.bk-cat').innerHTML = catOptionsHTML(this.value)">
                             <option value="expense">↑ ចំណាយ</option>
                             <option value="income">↓ ចំណូល</option>
                         </select>
-                        <select class="input-control bk-cat" style="padding: 7px; font-size: 12.5px;">
+                        <select class="input-control bk-cat" style="padding: 8px;">
                             ${catOptionsHTML('expense')}
                         </select>
-                        <select class="input-control bk-pay" style="padding: 7px; font-size: 12.5px; font-weight: 700;">
+                        <select class="input-control bk-pay" style="padding: 8px; font-weight: 700;">
                             <option value="cash">💵 សាច់ប្រាក់</option>
                             <option value="bank:ABA Bank">🏦 ABA Bank</option>
                             <option value="bank:ACLEDA Bank">🏦 អេស៊ីលីដា</option>
@@ -2543,14 +2498,14 @@
                             <option value="bank:Canadia Bank">🏦 កាណាឌីយ៉ា</option>
                             <option value="bank:ធនាគារផ្សេងៗ">🏦 ធនាគារផ្សេងៗ</option>
                         </select>
-                        <div style="display: flex; gap: 4px;">
-                            <input type="number" class="input-control bk-amt" step="any" min="0" placeholder="ទឹកប្រាក់ *" style="padding: 7px; font-weight: 800; flex: 1;">
-                            <select class="input-control bk-curr" style="width: 62px; padding: 7px; font-weight: 700;">
+                        <div class="bulk-amt-group">
+                            <input type="number" class="input-control bk-amt" step="any" min="0" inputmode="decimal" placeholder="ចំនួនទឹកប្រាក់ *" style="padding: 9px 10px; font-weight: 800;">
+                            <select class="input-control bk-curr" style="padding: 9px 4px; font-weight: 800;">
                                 <option value="KHR" ${config.currency === 'KHR' ? 'selected' : ''}>៛</option>
                                 <option value="USD" ${config.currency === 'USD' ? 'selected' : ''}>$</option>
                             </select>
                         </div>
-                        <input type="text" class="input-control bk-note" placeholder="កំណត់ចំណាំ..." style="padding: 7px;">
+                        <input type="text" class="input-control bk-note" placeholder="📝 សរសេរកំណត់ចំណាំនៅទីនេះ..." style="padding: 9px 12px;">
                     </div>
                 `;
                 wrap.appendChild(row);
@@ -2859,7 +2814,6 @@
             notify('បានលុបកាបូបលុយ');
         }
 
-        // Export Excel CSV with UTF-8 BOM
         function exportCSV(onlySelectedPeriod) {
             let list = transactions.filter(tx => activeWalletId === 'all' || tx.walletId === activeWalletId);
             if (onlySelectedPeriod) {
@@ -2978,9 +2932,8 @@
             }
         }
 
-        // JSON Backup & Smart Merge Restore
         function exportBackupJSON() {
-            const data = { version: 4, exportedAt: new Date().toISOString(), config, wallets, transactions, goals };
+            const data = { version: 5, exportedAt: new Date().toISOString(), config, wallets, transactions, goals };
             triggerDownload(JSON.stringify(data, null, 2), `Khmer_Expense_Backup_${getToday()}.json`, 'application/json');
             notify('បានទាញយកឯកសារ Backup JSON ជោគជ័យ!');
         }
@@ -3127,9 +3080,7 @@
             }
         }
 
-        // Desktop Keyboard Shortcuts
         document.addEventListener('keydown', (e) => {
-            // PIN Screen numeric input
             if (document.getElementById('pinScreen').classList.contains('open')) {
                 if (/^[0-9]$/.test(e.key)) pressPin(e.key);
                 else if (e.key === 'Backspace') backspacePin();
@@ -3198,7 +3149,7 @@
 
                 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                     const sw = `
-                        const C = 'kh-universal-offline-v4';
+                        const C = 'kh-universal-offline-v5';
                         self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(['./']))); });
                         self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
                         self.addEventListener('fetch', e => {
@@ -3229,18 +3180,21 @@
         }
 
         // ==========================================
-        // 13. STARTUP
-        // ==========================================
         // 13. MOBILE VIEWPORT STABILITY & STARTUP
         // ==========================================
         function setupMobileViewportStability() {
             const adjustForKeyboard = () => {
-                const openDialog = document.querySelector('.modal-overlay.open .modal-dialog');
+                const openOverlay = document.querySelector('.modal-overlay.open');
+                const openDialog = openOverlay ? openOverlay.querySelector('.modal-dialog') : null;
                 if (!openDialog) return;
                 if (window.innerWidth <= 860 && window.visualViewport) {
-                    const vvHeight = window.visualViewport.height;
-                    openDialog.style.height = Math.round(vvHeight * 0.94) + 'px';
-                    openDialog.style.maxHeight = Math.round(vvHeight * 0.94) + 'px';
+                    const vv = window.visualViewport;
+                    openOverlay.style.top = vv.offsetTop + 'px';
+                    openOverlay.style.height = vv.height + 'px';
+                    openOverlay.style.maxHeight = vv.height + 'px';
+                    openDialog.style.height = vv.height + 'px';
+                    openDialog.style.maxHeight = vv.height + 'px';
+                    openDialog.style.borderRadius = (vv.height < window.innerHeight * 0.85) ? '0px' : '22px 22px 0 0';
                 }
                 if (document.body.classList.contains('modal-open') && window.scrollY !== 0) {
                     window.scrollTo(0, 0);
@@ -3249,11 +3203,7 @@
 
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', adjustForKeyboard);
-                window.visualViewport.addEventListener('scroll', () => {
-                    if (document.body.classList.contains('modal-open')) {
-                        window.scrollTo(0, 0);
-                    }
-                });
+                window.visualViewport.addEventListener('scroll', adjustForKeyboard);
             }
 
             document.addEventListener('focusin', (e) => {
@@ -3261,8 +3211,11 @@
                 if (body && window.innerWidth <= 860) {
                     setTimeout(() => {
                         adjustForKeyboard();
-                        e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                    }, 120);
+                        const bodyRect = body.getBoundingClientRect();
+                        const elRect = e.target.getBoundingClientRect();
+                        const offset = (elRect.top - bodyRect.top) - (bodyRect.height * 0.25);
+                        body.scrollBy({ top: offset, behavior: 'smooth' });
+                    }, 180);
                 }
             });
 
@@ -3270,8 +3223,17 @@
                 if (window.innerWidth <= 860) {
                     setTimeout(() => {
                         window.scrollTo(0, 0);
-                        adjustForKeyboard();
-                    }, 80);
+                        const openOverlay = document.querySelector('.modal-overlay.open');
+                        const openDialog = openOverlay ? openOverlay.querySelector('.modal-dialog') : null;
+                        if (openOverlay && openDialog && (!window.visualViewport || window.visualViewport.height > window.innerHeight * 0.85)) {
+                            openOverlay.style.top = '';
+                            openOverlay.style.height = '100dvh';
+                            openOverlay.style.maxHeight = '100dvh';
+                            openDialog.style.height = '94dvh';
+                            openDialog.style.maxHeight = '94dvh';
+                            openDialog.style.borderRadius = '22px 22px 0 0';
+                        }
+                    }, 120);
                 }
             });
         }
